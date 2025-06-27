@@ -1,16 +1,10 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { OrquestadorComponent } from './modules/orquestador/orquestador.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  template: `
-    <h1>Welcome to {{title}}!</h1>
-
-    <router-outlet />
-  `,
-  styles: [],
+  imports: [OrquestadorComponent],
+  template: ` <app-orquestador /> `,
+  styles: ``,
 })
-export class AppComponent {
-  title = 'tacotitos';
-}
+export class AppComponent {}

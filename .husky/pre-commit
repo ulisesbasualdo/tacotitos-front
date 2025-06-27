@@ -1,0 +1,22 @@
+echo "🔍 Verificando errores con ESLint..."
+npx lint-staged --verbose
+if [ $? -ne 0 ]; then
+  echo "❌ ESLint encontró errores. Por favor corrígelos antes de hacer commit."
+  exit 1
+fi
+
+echo "🧪 Ejecutando tests unitarios..."
+ng test --browsers=ChromeHeadless --watch=false
+if [ $? -ne 0 ]; then
+  echo "❌ Las pruebas unitarias fallaron. Abortando commit."
+  exit 1
+fi
+
+echo "✨ Formateando código con Prettier..."
+npx prettier --write .
+if [ $? -ne 0 ]; then
+  echo "❌ Prettier encontró errores. Abortando commit."
+  exit 1
+fi
+
+echo "✅ Verificaciones pre-commit completadas con éxito!"
