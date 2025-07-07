@@ -1,25 +1,55 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input } from '@angular/core';
+import { SvgTimesComponent } from '../../resources/svg-times/svg-times.component';
+import { SvgPenComponent } from '../../resources/svg-pen/svg-pen.component';
+import { SvgTrashComponent } from '../../resources/svg-trash/svg-trash.component';
+import { SvgPlusComponent } from '../../resources/svg-plus/svg-plus.component';
+import { SvgSaveComponent } from '../../resources/svg-save/svg-save.component';
 
 type ButtonColor = 'blue' | 'red' | 'green' | 'bgGrayTxtBlue' | 'default';
 
 @Component({
   selector: 'app-btn, ui-btn',
-  imports: [],
+  imports: [
+    SvgTimesComponent,
+    SvgPenComponent,
+    SvgTrashComponent,
+    SvgPlusComponent,
+    SvgSaveComponent,
+  ],
   template: `
-    @if (text()) {
-      <button
-        [class]="color()"
-        [class.btn-sm]="size() === 'small'"
-        [class.btn-lg]="size() === 'large'"
-        [class.blue]="color() === 'blue'"
-        [class.red]="color() === 'red'"
-        [class.green]="color() === 'green'"
-        [class.disabled]="disabled()"
-        [disabled]="disabled()"
-        (click)="clickEvent.emit()">
+    <button
+      [class]="color()"
+      [class.btn-sm]="size() === 'small'"
+      [class.btn-lg]="size() === 'large'"
+      [class.blue]="color() === 'blue'"
+      [class.red]="color() === 'red'"
+      [class.green]="color() === 'green'"
+      [class.disabled]="disabled()"
+      [disabled]="disabled()"
+      [class.has-icon]="icon()">
+      @if (text()) {
         {{ text() }}
-      </button>
-    }
+      }
+      @if (icon()) {
+        @switch (icon()) {
+          @case ('times') {
+            <app-svg-times [disabled]="disabled()" />
+          }
+          @case ('pen') {
+            <app-svg-pen [disabled]="disabled()" />
+          }
+          @case ('trash') {
+            <app-svg-trash [disabled]="disabled()" />
+          }
+          @case ('save') {
+            <app-svg-save [disabled]="disabled()" />
+          }
+          @case ('plus') {
+            <app-svg-plus [disabled]="disabled()" />
+          }
+        }
+      }
+    </button>
   `,
   styles: `
     button {
@@ -28,7 +58,6 @@ type ButtonColor = 'blue' | 'red' | 'green' | 'bgGrayTxtBlue' | 'default';
       padding: 10px 20px;
       cursor: pointer;
       font-weight: 600;
-      font-family: 'Zain', sans-serif;
       transition:
         background-color 0.3s ease,
         color 0.3s ease;
@@ -36,6 +65,10 @@ type ButtonColor = 'blue' | 'red' | 'green' | 'bgGrayTxtBlue' | 'default';
         cursor: not-allowed;
         background-color: #f8f9fa;
         color: #6c757d;
+        border: none;
+      }
+      &.has-icon {
+        padding: 5px 10px;
       }
     }
     .blue {
@@ -77,9 +110,9 @@ type ButtonColor = 'blue' | 'red' | 'green' | 'bgGrayTxtBlue' | 'default';
   `,
 })
 export class BtnComponent {
-  public text = input<string>('');
+  public text = input<string | null>(null);
   public color = input<ButtonColor>('default');
   public size = input<string>('default');
   public disabled = input<boolean>(false);
-  public clickEvent = output();
+  public icon = input<'times' | 'trash' | 'pen' | 'plus' | 'save' | null>(null);
 }

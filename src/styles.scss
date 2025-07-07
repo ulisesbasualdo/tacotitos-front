@@ -1,1 +1,45 @@
 /* You can add global styles to this file, and also import other style files */
+
+body {
+  font-family: verdana, sans-serif;
+}
+
+.flex {
+  display: flex;
+}
+.flex-row {
+  flex-direction: row;
+}
+.flex-column {
+  flex-direction: column;
+}
+
+.gap-2 {
+  gap: 0.5rem !important;
+}
+
+.btn-group {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+}
+
+// ======================
+// === TEXTO
+// ======================
+
+.text-right {
+  text-align: right;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-nowrap {
+  text-wrap: nowrap;
+}
+
+// ======================
+// ==== FIN TEXTO
+// ======================
