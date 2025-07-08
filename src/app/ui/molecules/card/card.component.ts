@@ -1,6 +1,5 @@
 import { Component, computed, input } from '@angular/core';
 import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
-
 @Component({
   selector: 'app-card, ui-card',
   imports: [],
@@ -8,7 +7,8 @@ import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
     <div
       class="card"
       [class.new-card]="isNewCard()"
-      [class.width-100]="hasWidth100()">
+      [class.width-100]="hasWidth100()"
+      [class.mt-3]="_hasMarginTop()">
       <div class="card-header">
         @if (titleText()) {
           <h2 class="title">{{ superTitle() }}</h2>
@@ -43,7 +43,7 @@ import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
       width: calc(33.333% - 2em);
       min-width: 300px;
       box-sizing: border-box;
-      margin: 0;
+      // margin: 0;
       flex: 1 1 calc(33.333% - 2em);
 
       .card-header {
@@ -113,5 +113,10 @@ export class CardComponent {
   public width100 = input<BooleanInput>(false);
   protected hasWidth100 = computed(() =>
     coerceBooleanProperty(this.width100())
+  );
+
+  public hasMarginTop = input<BooleanInput>(false);
+  protected _hasMarginTop = computed(() =>
+    coerceBooleanProperty(this.hasMarginTop())
   );
 }

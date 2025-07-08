@@ -10,8 +10,8 @@ import { ITaco } from '../../interfaces/i-taco';
 import { TacosService } from '../../services/data/tacos.service';
 import { UiTabsGroupComponent, UiTabDirective } from '../../ui/features/tabs';
 import { CrearTacoFormComponent } from '../tacos/crear-taco-form/crear-taco-form.component';
-import { ChipsDemoComponent } from '../../ui/features/select-multiple-chips/chips-demo.component';
 import { BdComponent } from '../tacos/bd/bd.component';
+import { EstadisticasComponent } from '../tacos/estadisticas/estadisticas.component';
 
 @Component({
   selector: 'app-orquestador',
@@ -22,8 +22,8 @@ import { BdComponent } from '../tacos/bd/bd.component';
     UiTabsGroupComponent,
     UiTabDirective,
     CrearTacoFormComponent,
-    ChipsDemoComponent,
     BdComponent,
+    EstadisticasComponent,
   ],
   template: `
     <ui-main-layout>
@@ -75,11 +75,8 @@ import { BdComponent } from '../tacos/bd/bd.component';
               <ng-template uiTab="Crear Taco">
                 <app-crear-taco-form />
               </ng-template>
-              <ng-template uiTab="Selector de Chips">
-                <app-chips-demo />
-              </ng-template>
               <ng-template uiTab="Estadísticas">
-                <p>Contenido del Tab 2</p>
+                <app-estadisticas />
               </ng-template>
               <ng-template uiTab="Base de Tacos">
                 <app-bd />

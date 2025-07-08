@@ -1,10 +1,14 @@
 import { AbstractControl } from '@angular/forms';
 import { ITacoContent } from './i-taco-content';
+import { IAlimento } from './i-alimento';
 
 export type FormControlsOf<T> = {
   [K in keyof T]: AbstractControl<T[K]>;
 };
 
-export interface TortillaEditable extends ITacoContent {
+export interface ITortillaEditable extends ITacoContent {
+  editMode: boolean;
+}
+export interface IAlimentoEditable extends IAlimento {
   editMode: boolean;
 }
