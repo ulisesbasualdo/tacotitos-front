@@ -12,3 +12,10 @@ export interface ITortillaEditable extends ITacoContent {
 export interface IAlimentoEditable extends IAlimento {
   editMode: boolean;
 }
+
+export interface ISelectMultiple {
+  id: number;
+  label: string;
+  value: string;
+  selected: boolean;
+}

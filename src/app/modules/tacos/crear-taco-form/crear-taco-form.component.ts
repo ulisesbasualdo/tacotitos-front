@@ -1,4 +1,4 @@
-import { Component, output, signal } from '@angular/core';
+import { Component, OnInit, output, signal } from '@angular/core';
 import { ITaco } from '../../../interfaces/i-taco';
 import {
   FormBuilder,
@@ -11,12 +11,13 @@ import { ITacoContent } from '../../../interfaces/i-taco-content';
 import { BtnComponent } from '../../../ui/atoms/btn/btn.component';
 import { CardComponent } from '../../../ui/molecules/card/card.component';
 import { ChipItem } from '../../../ui/features/select-multiple-chips/select-multiple-chips.component';
+import { ISelectMultiple } from '../../../interfaces/definitions';
 
 interface ITacoForm {
   tortilla: FormGroup<{
     nombre: FormControl<string>;
     tipo: FormControl<'simple' | 'doble'>;
-    alimentos: FormControl<ChipItem[] | null>;
+    alimentos: FormControl<string | null>;
     salsa: FormControl<string | null>;
   }>;
 }
@@ -25,93 +26,91 @@ interface ITacoForm {
   selector: 'app-crear-taco-form',
   imports: [ReactiveFormsModule, BtnComponent, CardComponent],
   template: `
-    <div class="container-card">
-      <ui-card width100 titleText="Crear Taco">
-        <div cardBody>
-          <form [formGroup]="form" (ngSubmit)="onSubmit()">
-            <!-- Sección Tortilla -->
-            <div formGroupName="tortilla">
-              <h3>Tortilla</h3>
-              <div class="flex flex-row gap-2">
-                <div>
-                  <!-- grupo de 2 checkbox para elegir entre tortilla simple o doble -->
-                  <div class="radio-group">
-                    <label>
-                      <input
-                        type="radio"
-                        formControlName="tipo"
-                        value="simple" />
-                      Tortilla simple
-                    </label>
-                    <label>
-                      <input
-                        type="radio"
-                        formControlName="tipo"
-                        value="doble" />
-                      Tortilla doble
-                    </label>
-                  </div>
-                  <div class="container-tortilla">
-                    <label for="tortillaNombre">Tipo de tortilla:</label>
-                    <select
-                      formControlName="nombre"
-                      id="tortillaNombre"
-                      required>
-                      @for (tortilla of tortillaList; track $index) {
-                        <option [value]="tortilla">
-                          {{ tortilla }}
-                        </option>
-                      }
-                    </select>
-                  </div>
+    <ui-card width100 titleText="Crear Taco">
+      <div cardBody>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <!-- Sección Tortilla -->
+          <div formGroupName="tortilla">
+            <h3>Tortilla</h3>
+            <div class="flex flex-row gap-2">
+              <div>
+                <!-- grupo de 2 checkbox para elegir entre tortilla simple o doble -->
+                <div class="radio-group mb-5">
+                  <label>
+                    <input type="radio" formControlName="tipo" value="simple" />
+                    Tortilla simple
+                  </label>
+                  <label>
+                    <input type="radio" formControlName="tipo" value="doble" />
+                    Tortilla doble
+                  </label>
                 </div>
-                <div class="row-2">
-                  <div class="container-alimentos">
-                    <label for="tortillaAlimentos">Alimentos:</label>
-                    <select
-                      formControlName="alimentos"
-                      name="tortillaAlimentos"
-                      id="tortillaAlimentos"
-                      multiple
-                      size="7">
-                      @for (alimento of alimentosList; track $index) {
-                        <option [value]="alimento.value">
-                          {{ alimento.label }}
-                        </option>
+                <div class="container-tortilla">
+                  <label for="tortillaNombre">Tipo de tortilla:</label>
+                  <select formControlName="nombre" id="tortillaNombre" required>
+                    @for (tortilla of tortillaList; track $index) {
+                      <option [value]="tortilla">
+                        {{ tortilla }}
+                      </option>
+                    }
+                  </select>
+                </div>
+              </div>
+              <div class="row-2">
+                <div class="container-alimentos">
+                  <label for="tortillaAlimentos">Alimentos:</label>
+                  <select
+                    formControlName="alimentos"
+                    name="tortillaAlimentos"
+                    id="tortillaAlimentos">
+                    @for (alimento of alimentosList; track alimento.id) {
+                      <option [value]="alimento.value">
+                        {{ alimento.label }} -
+                        {{ alimento.selected ? 'selecionado' : '' }}
+                      </option>
+                    }
+                  </select>
+                </div>
+                <div>
+                  Alimentos seleccionados:
+                  <ul>
+                    @for (alimento of alimentosList; track alimento.id) {
+                      @if (alimento.selected) {
+                        <li>{{ alimento.label }}</li>
                       }
-                    </select>
-                  </div>
-                  <div class="container-salsa">
-                    <label for="salsa">Salsa:</label>
-                    <select formControlName="salsa" name="salsa" id="salsa">
-                      @for (salsa of salsaList; track $index) {
-                        <option [value]="salsa.value">
-                          {{ salsa.label }}
-                        </option>
-                      }
-                    </select>
-                  </div>
+                    }
+                  </ul>
+                </div>
+                <div class="container-salsa">
+                  <label for="salsa">Salsa:</label>
+                  <select formControlName="salsa" name="salsa" id="salsa">
+                    @for (salsa of salsaList; track $index) {
+                      <option [value]="salsa.value">
+                        {{ salsa.label }}
+                      </option>
+                    }
+                  </select>
                 </div>
               </div>
             </div>
-            <div class="btn-group">
-              <!-- Sección Salsa -->
-              <ui-btn
-                [color]="'bgGrayTxtBlue'"
-                [text]="'Restablecer'"
-                [disabled]="form.pristine"
-                (click)="form.reset()"></ui-btn>
-              <ui-btn
-                [color]="'green'"
-                [text]="'Crear Pedido'"
-                type="submit"
-                [disabled]="form.invalid">
-              </ui-btn>
-            </div>
-          </form>
-        </div>
-      </ui-card>
-    </div>
+          </div>
+          <div class="btn-group">
+            <!-- Sección Salsa -->
+            <ui-btn
+              [color]="'bgGrayTxtBlue'"
+              [text]="'Restablecer'"
+              [disabled]="form.pristine"
+              (click)="form.reset()"></ui-btn>
+            <ui-btn
+              [color]="'green'"
+              [text]="'Crear Pedido'"
+              type="submit"
+              [disabled]="form.invalid">
+            </ui-btn>
+          </div>
+        </form>
+      </div>
+    </ui-card>
   `,
   styles: `
     .container-card {
@@ -133,8 +132,6 @@ interface ITacoForm {
     .radio-group {
       display: flex;
       flex-direction: column;
-      // gap: 20px;
-      // margin-bottom: 15px;
       label {
         font-weight: normal;
         text-wrap: nowrap;
@@ -203,7 +200,7 @@ interface ITacoForm {
     }
   `,
 })
-export class CrearTacoFormComponent {
+export class CrearTacoFormComponent implements OnInit {
   tortillaList: string[] = [
     'Tortilla de maíz',
     'Tortilla de harina',
@@ -217,12 +214,12 @@ export class CrearTacoFormComponent {
     'Tortilla de papa',
   ];
 
-  alimentosList: ChipItem[] = [
-    { id: 'tortilla', label: 'carne', value: 'carne' },
-    { id: 'queso', label: 'queso', value: 'queso' },
-    { id: 'frijoles', label: 'frijoles', value: 'frijoles' },
-    { id: 'aguacate', label: 'aguacate', value: 'aguacate' },
-    { id: 'cebolla', label: 'cebolla', value: 'cebolla' },
+  alimentosList: ISelectMultiple[] = [
+    { id: 1, label: 'carne', value: 'carne', selected: false },
+    { id: 2, label: 'queso', value: 'queso', selected: false },
+    { id: 3, label: 'frijoles', value: 'frijoles', selected: false },
+    { id: 4, label: 'aguacate', value: 'aguacate', selected: false },
+    { id: 5, label: 'cebolla', value: 'cebolla', selected: false },
   ];
 
   salsaList: ChipItem[] = [
@@ -261,7 +258,7 @@ export class CrearTacoFormComponent {
           nonNullable: true,
           validators: [Validators.required],
         }),
-        alimentos: new FormControl<ChipItem[] | null>(null, {
+        alimentos: new FormControl<string | null>(null, {
           nonNullable: true,
           validators: [Validators.required],
         }),
@@ -271,6 +268,20 @@ export class CrearTacoFormComponent {
         }),
       }),
     });
+  }
+
+  ngOnInit(): void {
+    this.form.controls.tortilla.controls.alimentos.valueChanges.subscribe(
+      selectedValue => {
+        if (selectedValue) {
+          this.alimentosList.forEach(item => {
+            if (item.value === selectedValue) {
+              item.selected = true;
+            }
+          });
+        }
+      }
+    );
   }
 
   onSubmit() {
