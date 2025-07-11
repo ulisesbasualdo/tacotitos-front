@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { TipoTortillaComponent } from './tipo-tortilla.component';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('TipoTortillaComponent', () => {
   let component: TipoTortillaComponent;
@@ -9,6 +9,7 @@ describe('TipoTortillaComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TipoTortillaComponent],
+      providers: [provideHttpClient()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TipoTortillaComponent);

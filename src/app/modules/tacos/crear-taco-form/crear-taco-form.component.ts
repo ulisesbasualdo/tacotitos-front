@@ -231,18 +231,15 @@ export class CrearTacoFormComponent implements OnInit {
       const tortilla: ITacoContent = {
         nombre: formValue.tortilla!.nombre!,
         precio: 2,
-        getPrecioCosto: function () {
-          return this.precio;
-        },
       };
 
       // Crear objeto taco
       const taco: ITaco = {
         tortilla: tortilla,
         getPrecioCosto: function () {
-          let costo = this.tortilla.getPrecioCosto();
+          let costo = this.tortilla.precio;
           if (this.salsa) {
-            costo += this.salsa.getPrecioCosto();
+            costo += this.salsa.precio;
           }
           return costo;
         },

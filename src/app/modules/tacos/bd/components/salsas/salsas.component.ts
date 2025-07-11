@@ -29,7 +29,7 @@ import { BtnComponent } from '../../../../../ui/atoms/btn/btn.component';
           <tr>
             @if (!item.editMode) {
               <td>{{ item.nombre }}</td>
-              <td>{{ item.getPrecioCosto() }}</td>
+              <td>{{ item.precio }}</td>
               <td>
                 <ui-btn (click)="habilitarEditar(i)" icon="pen" />
                 <ui-btn icon="save" /> <ui-btn icon="trash" />
@@ -67,9 +67,6 @@ export class SalsasComponent {
       tipoAlimento: 'salsa',
       nombre: 'tomate',
       precio: 2,
-      getPrecioCosto() {
-        return this.precio;
-      },
       editMode: false,
     },
     {
@@ -77,9 +74,6 @@ export class SalsasComponent {
       tipoAlimento: 'salsa',
       nombre: 'cheddar',
       precio: 4.5,
-      getPrecioCosto() {
-        return this.precio;
-      },
       editMode: false,
     },
     {
@@ -87,9 +81,6 @@ export class SalsasComponent {
       tipoAlimento: 'salsa',
       nombre: 'blanca',
       precio: 4.5,
-      getPrecioCosto() {
-        return this.precio;
-      },
       editMode: false,
     },
     {
@@ -97,9 +88,6 @@ export class SalsasComponent {
       tipoAlimento: 'salsa',
       nombre: 'golf',
       precio: 4.5,
-      getPrecioCosto() {
-        return this.precio;
-      },
       editMode: false,
     },
   ];

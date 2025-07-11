@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ITaco } from '../../interfaces/i-taco';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment.development';
+import { ITacoContent } from '../../interfaces/i-taco-content';
 
 const API_URL = 'http://localhost:3000/tacos';
 
@@ -21,7 +23,12 @@ export class TacosService {
     return this.httpClient.get<number>(`${API_URL}/stats/average-price`);
   }
   getTacos(): Observable<ITaco[]> {
-    return this.httpClient.get<ITaco[]>(API_URL);
+    const url = environment.mockeable ? 'json/get-tacos.json' : API_URL;
+    return this.httpClient.get<ITaco[]>(url);
+  }
+  getTortillas(): Observable<ITacoContent[]> {
+    const url = environment.mockeable ? 'json/get-tortillas.json' : API_URL;
+    return this.httpClient.get<ITacoContent[]>(url);
   }
 
   createTaco(taco: ITaco): Observable<ITaco> {

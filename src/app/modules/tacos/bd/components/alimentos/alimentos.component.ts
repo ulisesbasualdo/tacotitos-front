@@ -29,7 +29,7 @@ import { IAlimentoEditable } from '../../../../../interfaces/definitions';
           <tr>
             @if (!item.editMode) {
               <td>{{ item.nombre }}</td>
-              <td>{{ item.getPrecioCosto() }}</td>
+              <td>{{ item.precio }}</td>
               <td>
                 <ui-btn (click)="habilitarEditar(i)" icon="pen" />
                 <ui-btn icon="save" /> <ui-btn icon="trash" />
@@ -67,9 +67,6 @@ export class AlimentosComponent {
       tipoAlimento: 'alimentoTortilla',
       nombre: 'carne',
       precio: 3,
-      getPrecioCosto() {
-        return this.precio;
-      },
       editMode: false,
     },
     {
@@ -77,9 +74,6 @@ export class AlimentosComponent {
       tipoAlimento: 'alimentoTortilla',
       nombre: 'pollo',
       precio: 2.5,
-      getPrecioCosto() {
-        return this.precio;
-      },
       editMode: false,
     },
     {
@@ -87,9 +81,6 @@ export class AlimentosComponent {
       tipoAlimento: 'alimentoTortilla',
       nombre: 'pescado',
       precio: 4,
-      getPrecioCosto() {
-        return this.precio;
-      },
       editMode: false,
     },
     {
@@ -97,9 +88,6 @@ export class AlimentosComponent {
       tipoAlimento: 'alimentoTortilla',
       nombre: 'frijoles',
       precio: 1.5,
-      getPrecioCosto() {
-        return this.precio;
-      },
       editMode: false,
     },
     {
@@ -107,9 +95,6 @@ export class AlimentosComponent {
       tipoAlimento: 'alimentoTortilla',
       nombre: 'queso',
       precio: 2,
-      getPrecioCosto() {
-        return this.precio;
-      },
       editMode: false,
     },
     {
@@ -117,9 +102,6 @@ export class AlimentosComponent {
       tipoAlimento: 'alimentoTortilla',
       nombre: 'verduras',
       precio: 1.8,
-      getPrecioCosto() {
-        return this.precio;
-      },
       editMode: false,
     },
   ];
