@@ -1,9 +1,10 @@
-import { Component, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { SvgTimesComponent } from '../../resources/svg-times/svg-times.component';
 import { SvgPenComponent } from '../../resources/svg-pen/svg-pen.component';
 import { SvgTrashComponent } from '../../resources/svg-trash/svg-trash.component';
 import { SvgPlusComponent } from '../../resources/svg-plus/svg-plus.component';
 import { SvgSaveComponent } from '../../resources/svg-save/svg-save.component';
+import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 
 type ButtonColor = 'blue' | 'red' | 'green' | 'bgGrayTxtBlue' | 'default';
 
@@ -26,7 +27,8 @@ type ButtonColor = 'blue' | 'red' | 'green' | 'bgGrayTxtBlue' | 'default';
       [class.green]="color() === 'green'"
       [class.disabled]="disabled()"
       [disabled]="disabled()"
-      [class.has-icon]="icon()">
+      [class.has-icon]="icon()"
+      [class.no-hover]="_noHover()">
       @if (text()) {
         {{ text() }}
       }
@@ -107,6 +109,11 @@ type ButtonColor = 'blue' | 'red' | 'green' | 'bgGrayTxtBlue' | 'default';
         background-color: #e2e6ea;
       }
     }
+    .no-hover {
+      &:hover {
+        background-color: transparent;
+      }
+    }
   `,
 })
 export class BtnComponent {
@@ -115,4 +122,6 @@ export class BtnComponent {
   public size = input<string>('default');
   public disabled = input<boolean>(false);
   public icon = input<'times' | 'trash' | 'pen' | 'plus' | 'save' | null>(null);
+  public noHover = input<BooleanInput>(false);
+  protected _noHover = computed(() => coerceBooleanProperty(this.noHover()));
 }

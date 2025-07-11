@@ -57,6 +57,7 @@ import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: pre-wrap;
+        padding: 24px;
       }
       .card-footer {
         background-color: #ffffff44;

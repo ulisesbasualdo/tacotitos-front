@@ -7,7 +7,7 @@ import { CardComponent } from '../../../ui/molecules/card/card.component';
   template: `
     <ui-card titleText="Estadísticas" width100>
       <div cardBody>
-        <table>
+        <table class="table">
           <thead>
             <tr>
               <th></th>
@@ -38,20 +38,6 @@ import { CardComponent } from '../../../ui/molecules/card/card.component';
       <div cardFooter>Valor promedio de un taco: 20 pesos</div>
     </ui-card>
   `,
-  styles: `
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th,
-    td {
-      padding: 8px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-  `,
+  styles: ``,
 })
 export class EstadisticasComponent {}
