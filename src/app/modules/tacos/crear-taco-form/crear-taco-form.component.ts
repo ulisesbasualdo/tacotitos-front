@@ -1,4 +1,4 @@
-import { Component, OnInit, output, signal } from '@angular/core';
+import { Component, OnInit, output } from '@angular/core';
 import { ITaco } from '../../../interfaces/i-taco';
 import {
   FormBuilder,
@@ -10,8 +10,12 @@ import {
 import { ITacoContent } from '../../../interfaces/i-taco-content';
 import { BtnComponent } from '../../../ui/atoms/btn/btn.component';
 import { CardComponent } from '../../../ui/molecules/card/card.component';
-import { ChipItem } from '../../../ui/features/select-multiple-chips/select-multiple-chips.component';
-import { ISelectMultiple } from '../../../interfaces/definitions';
+import {
+  ISelectMultiple,
+  ISelectSimple,
+} from '../../../interfaces/definitions';
+import { TacosService } from '../../../services/data/tacos.service';
+import { IAlimento } from '../../../interfaces/i-alimento';
 
 interface ITacoForm {
   tortilla: FormGroup<{
@@ -125,7 +129,7 @@ interface ITacoForm {
               [color]="'bgGrayTxtBlue'"
               [text]="'Restablecer'"
               [disabled]="form.pristine"
-              (click)="form.reset()"></ui-btn>
+              (click)="limpiarAlimentosSelected(); form.reset()"></ui-btn>
             <ui-btn
               [color]="'green'"
               [text]="'Crear Pedido'"
@@ -140,53 +144,20 @@ interface ITacoForm {
   styles: ``,
 })
 export class CrearTacoFormComponent implements OnInit {
-  tortillaList: string[] = [
-    'Tortilla de maíz',
-    'Tortilla de harina',
-    'Tortilla de nopal',
-    'Tortilla de trigo',
-    'Tortilla de arroz',
-    'Tortilla de avena',
-    'Tortilla de espinaca',
-    'Tortilla de betabel',
-    'Tortilla de quinoa',
-    'Tortilla de papa',
-  ];
+  tortillaList: string[] = [];
 
-  alimentosList: ISelectMultiple[] = [
-    { id: 1, label: 'carne', value: 'carne', selected: false },
-    { id: 2, label: 'queso', value: 'queso', selected: false },
-    { id: 3, label: 'frijoles', value: 'frijoles', selected: false },
-    { id: 4, label: 'aguacate', value: 'aguacate', selected: false },
-    { id: 5, label: 'cebolla', value: 'cebolla', selected: false },
-  ];
+  alimentosList: ISelectMultiple[] = [];
 
-  salsaList: ChipItem[] = [
-    { id: '-', label: '-', value: '-' },
-    { id: 'salsa-verde', label: 'Salsa verde', value: 'salsa-verde' },
-    { id: 'salsa-roja', label: 'Salsa roja', value: 'salsa-roja' },
-    { id: 'salsa-mole', label: 'Salsa mole', value: 'salsa-mole' },
-    { id: 'salsa-chipotle', label: 'Salsa chipotle', value: 'salsa-chipotle' },
-    {
-      id: 'salsa-tamarindo',
-      label: 'Salsa de tamarindo',
-      value: 'salsa-tamarindo',
-    },
-  ];
+  salsaList: ISelectSimple[] = [];
 
   submitTaco = output<ITaco>();
 
   form: FormGroup<ITacoForm>;
 
-  private readonly _taco = signal<ITaco | null>(null);
-  get taco(): ITaco | null {
-    return this._taco();
-  }
-  set taco(value: ITaco | null) {
-    this._taco.set(value);
-  }
-
-  constructor(private readonly formBuilder: FormBuilder) {
+  constructor(
+    private readonly formBuilder: FormBuilder,
+    private readonly tacosService: TacosService
+  ) {
     this.form = this.formBuilder.group<ITacoForm>({
       tortilla: this.formBuilder.group({
         nombre: new FormControl<string>('', {
@@ -221,19 +192,17 @@ export class CrearTacoFormComponent implements OnInit {
         }
       }
     );
+    this.fillTortillaList();
+    this.fillAlimentoList();
   }
 
   onSubmit() {
     if (this.form.valid) {
       const formValue = this.form.value;
-
-      // Crear objeto tortilla que implementa ITacoContent
       const tortilla: ITacoContent = {
         nombre: formValue.tortilla!.nombre!,
         precio: 2,
       };
-
-      // Crear objeto taco
       const taco: ITaco = {
         tortilla: tortilla,
         getPrecioCosto: function () {
@@ -244,9 +213,53 @@ export class CrearTacoFormComponent implements OnInit {
           return costo;
         },
       };
-
       this.submitTaco.emit(taco);
       this.form.reset();
     }
+  }
+
+  fillTortillaList() {
+    this.tacosService.getTortillas().subscribe({
+      next: (res: ITacoContent[]) => {
+        res.forEach(tortilla => {
+          this.tortillaList.push(tortilla.nombre);
+        });
+      },
+      error: error => {
+        console.log(error);
+      },
+    });
+  }
+
+  fillAlimentoList() {
+    this.tacosService.getAlimentos().subscribe({
+      next: (res: IAlimento[]) => {
+        res.forEach(alimento => {
+          if (alimento.tipoAlimento === 'alimentoTortilla') {
+            this.alimentosList.push({
+              id: alimento.id ?? 0,
+              label: alimento.nombre,
+              value: alimento.nombre,
+              selected: false,
+            });
+          } else if (alimento.tipoAlimento === 'salsa') {
+            this.salsaList.push({
+              id: alimento.id ?? 0,
+              label: alimento.nombre,
+              value: alimento.nombre,
+            });
+          }
+        });
+      },
+      error: error => {
+        console.log(error);
+      },
+    });
+  }
+
+  limpiarAlimentosSelected() {
+    this.alimentosList.forEach(alimento => {
+      alimento.selected = false;
+    });
   }
 }

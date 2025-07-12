@@ -4,6 +4,7 @@ import { ITaco } from '../../interfaces/i-taco';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { ITacoContent } from '../../interfaces/i-taco-content';
+import { IAlimento } from '../../interfaces/i-alimento';
 
 const API_URL = 'http://localhost:3000/tacos';
 
@@ -29,6 +30,10 @@ export class TacosService {
   getTortillas(): Observable<ITacoContent[]> {
     const url = environment.mockeable ? 'json/get-tortillas.json' : API_URL;
     return this.httpClient.get<ITacoContent[]>(url);
+  }
+  getAlimentos(): Observable<IAlimento[]> {
+    const url = environment.mockeable ? 'json/get-alimentos.json' : API_URL;
+    return this.httpClient.get<IAlimento[]>(url);
   }
 
   createTaco(taco: ITaco): Observable<ITaco> {

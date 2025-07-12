@@ -13,9 +13,12 @@ export interface IAlimentoEditable extends IAlimento {
   editMode: boolean;
 }
 
-export interface ISelectMultiple {
+export interface ISelectMultiple extends ISelectSimple {
+  selected: boolean;
+}
+
+export interface ISelectSimple {
   id: number;
   label: string;
   value: string;
-  selected: boolean;
 }
