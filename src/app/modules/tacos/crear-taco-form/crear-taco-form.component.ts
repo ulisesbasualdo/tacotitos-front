@@ -1,5 +1,4 @@
 import { Component, OnInit, output } from '@angular/core';
-import { ITaco } from '../../../interfaces/i-taco';
 import {
   FormBuilder,
   FormControl,
@@ -7,15 +6,16 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ITacoContent } from '../../../interfaces/i-taco-content';
 import { BtnComponent } from '../../../ui/atoms/btn/btn.component';
 import { CardComponent } from '../../../ui/molecules/card/card.component';
 import {
+  ITaco,
+  ITacoContent,
+  IAlimento,
   ISelectMultiple,
   ISelectSimple,
 } from '../../../interfaces/definitions';
 import { TacosService } from '../../../services/data/tacos.service';
-import { IAlimento } from '../../../interfaces/i-alimento';
 
 interface ITacoForm {
   tortilla: FormGroup<{
@@ -203,15 +203,20 @@ export class CrearTacoFormComponent implements OnInit {
         nombre: formValue.tortilla!.nombre!,
         precio: 2,
       };
+      const alimentos = this.alimentosList
+        .filter(alimento => alimento.selected)
+        .map(alimento => {
+          return {
+            id: alimento.id,
+            nombre: alimento.label,
+            precio: 1,
+            tipoAlimento: 'alimentoTortilla',
+          } as IAlimento;
+        });
       const taco: ITaco = {
         tortilla: tortilla,
-        getPrecioCosto: function () {
-          let costo = this.tortilla.precio;
-          if (this.salsa) {
-            costo += this.salsa.precio;
-          }
-          return costo;
-        },
+        alimentos: alimentos,
+        precio: 100,
       };
       this.submitTaco.emit(taco);
       this.form.reset();

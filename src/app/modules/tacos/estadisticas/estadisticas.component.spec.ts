@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EstadisticasComponent } from './estadisticas.component';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('EstadisticasComponent', () => {
   let component: EstadisticasComponent;
@@ -9,6 +10,7 @@ describe('EstadisticasComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [EstadisticasComponent],
+      providers: [provideHttpClient()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(EstadisticasComponent);

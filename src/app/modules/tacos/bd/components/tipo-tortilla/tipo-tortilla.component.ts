@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { BtnComponent } from '../../../../../ui/atoms/btn/btn.component';
-import { ITortillaEditable } from '../../../../../interfaces/definitions';
+import {
+  ITortillaEditable,
+  ITacoContent,
+} from '../../../../../interfaces/definitions';
 import { TacosService } from '../../../../../services/data/tacos.service';
-import { ITacoContent } from '../../../../../interfaces/i-taco-content';
 
 @Component({
   selector: 'app-tipo-tortilla',

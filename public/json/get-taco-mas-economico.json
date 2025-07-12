@@ -1,0 +1,28 @@
+{
+  "tortilla": {
+    "id": 2,
+    "nombre": "tortilla de harina",
+    "precio": 18.0
+  },
+  "salsa": {
+    "id": 3,
+    "nombre": "salsa roja",
+    "precio": 8.5,
+    "tipoAlimento": "salsa"
+  },
+  "alimentos": [
+    {
+      "id": 5,
+      "nombre": "frijoles",
+      "precio": 7.0,
+      "tipoAlimento": "alimentoTortilla"
+    },
+    {
+      "id": 6,
+      "nombre": "queso",
+      "precio": 6.0,
+      "tipoAlimento": "alimentoTortilla"
+    }
+  ],
+  "precio": 39.5
+}

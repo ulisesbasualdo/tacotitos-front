@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CardComponent } from '../../../ui/molecules/card/card.component';
+import { ITaco } from '../../../interfaces/definitions';
+import { TacosService } from '../../../services/data/tacos.service';
 
 @Component({
   selector: 'app-estadisticas',
@@ -20,24 +22,66 @@ import { CardComponent } from '../../../ui/molecules/card/card.component';
           <tbody>
             <tr>
               <td>Taco más costoso</td>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
+              <td>{{ tacoMasCostoso?.precio || '-' }}</td>
+              <td>{{ tacoMasCostoso?.tortilla?.nombre || '-' }}</td>
+              <td>{{ tacoMasCostoso?.salsa?.nombre || '-' }}</td>
+              <td>{{ getAlimentosTacoCostoso() || '-' }}</td>
             </tr>
             <tr>
               <td>Taco más económico</td>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
+              <td>{{ tacoMasEconomico?.precio || '-' }}</td>
+              <td>{{ tacoMasEconomico?.tortilla?.nombre || '-' }}</td>
+              <td>{{ tacoMasEconomico?.salsa?.nombre || '-' }}</td>
+              <td>{{ getAlimentosTacoEconomico() || '-' }}</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div cardFooter>Valor promedio de un taco: 20 pesos</div>
+      <div cardFooter>
+        Valor promedio de un taco:
+        {{ valorPromedioTaco ? valorPromedioTaco : 'sin datos' }}
+      </div>
     </ui-card>
   `,
   styles: ``,
 })
-export class EstadisticasComponent {}
+export class EstadisticasComponent implements OnInit {
+  tacoMasCostoso: ITaco | null = null;
+  tacoMasEconomico: ITaco | null = null;
+  valorPromedioTaco: number | null = null;
+
+  constructor(private readonly tacosService: TacosService) {}
+  ngOnInit(): void {
+    this.tacosService.getTacoMasCostoso().subscribe(taco => {
+      if (!taco) {
+        console.log('no se pudo obtener el taco más costoso');
+        return;
+      }
+      this.tacoMasCostoso = taco;
+    });
+    this.tacosService.getTacoMasEconomico().subscribe(taco => {
+      if (!taco) {
+        console.log('no se pudo obtener el taco más económico');
+        return;
+      }
+      this.tacoMasEconomico = taco;
+    });
+    this.tacosService.getValorPromedio().subscribe(valor => {
+      if (!valor) {
+        console.log('no se pudo obtener el valor promedio');
+        return;
+      }
+      this.valorPromedioTaco = valor;
+    });
+  }
+
+  getAlimentosTacoCostoso(): string {
+    return this.tacoMasCostoso?.alimentos?.map(a => a.nombre).join(', ') || '-';
+  }
+
+  getAlimentosTacoEconomico(): string {
+    return (
+      this.tacoMasEconomico?.alimentos?.map(a => a.nombre).join(', ') || '-'
+    );
+  }
+}

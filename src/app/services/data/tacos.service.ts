@@ -1,10 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ITaco } from '../../interfaces/i-taco';
-import { Observable } from 'rxjs';
+import { ITaco, IAlimento, ITacoContent } from '../../interfaces/definitions';
+import { catchError, Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
-import { ITacoContent } from '../../interfaces/i-taco-content';
-import { IAlimento } from '../../interfaces/i-alimento';
 
 const API_URL = 'http://localhost:3000/tacos';
 
@@ -14,14 +12,23 @@ const API_URL = 'http://localhost:3000/tacos';
 export class TacosService {
   constructor(private readonly httpClient: HttpClient) {}
 
-  getTacoMasEconomico(): Observable<ITaco> {
-    return this.httpClient.get<ITaco>(`${API_URL}/stats/cheapest`);
+  getTacoMasEconomico(): Observable<ITaco | null> {
+    const url = environment.mockeable
+      ? 'json/get-taco-mas-economico.json'
+      : `${API_URL}/stats/cheapest`;
+    return this.httpClient.get<ITaco>(url).pipe(catchError(() => of(null)));
   }
-  getTacoMasCostoso(): Observable<ITaco> {
-    return this.httpClient.get<ITaco>(`${API_URL}/stats/most-expensive`);
+  getTacoMasCostoso(): Observable<ITaco | null> {
+    const url = environment.mockeable
+      ? 'json/get-taco-mas-costoso.json'
+      : `${API_URL}/stats/most-expensive`;
+    return this.httpClient.get<ITaco>(url).pipe(catchError(() => of(null)));
   }
-  getValorPromedio(): Observable<number> {
-    return this.httpClient.get<number>(`${API_URL}/stats/average-price`);
+  getValorPromedio(): Observable<number | null> {
+    const url = environment.mockeable
+      ? 'json/get-taco-valor-promedio.json'
+      : `${API_URL}/stats/average-price`;
+    return this.httpClient.get<number>(url).pipe(catchError(() => of(null)));
   }
   getTacos(): Observable<ITaco[]> {
     const url = environment.mockeable ? 'json/get-tacos.json' : API_URL;

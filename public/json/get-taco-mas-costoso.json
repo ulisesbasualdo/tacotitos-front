@@ -1,0 +1,28 @@
+{
+  "tortilla": {
+    "id": 1,
+    "nombre": "tortilla de maíz azul",
+    "precio": 40.5
+  },
+  "salsa": {
+    "id": 2,
+    "nombre": "salsa verde",
+    "precio": 15.75,
+    "tipoAlimento": "salsa"
+  },
+  "alimentos": [
+    {
+      "id": 3,
+      "nombre": "pollo",
+      "precio": 22.0,
+      "tipoAlimento": "alimentoTortilla"
+    },
+    {
+      "id": 4,
+      "nombre": "cebolla",
+      "precio": 5.5,
+      "tipoAlimento": "alimentoTortilla"
+    }
+  ],
+  "precio": 83.75
+}
