@@ -19,6 +19,7 @@ import { TacosService } from '../../../services/data/tacos.service';
 
 interface ITacoForm {
   tortilla: FormGroup<{
+    id: FormControl<number>;
     nombre: FormControl<string>;
     tipo: FormControl<'simple' | 'doble'>;
     alimentos: FormControl<string | null>;
@@ -36,6 +37,7 @@ interface ITacoForm {
           <!-- Sección Tortilla -->
           <div formGroupName="tortilla">
             <h3>Tortilla</h3>
+            <input type="hidden" formControlName="id" />
             <div class="row d-flex flex-row gap-2">
               <div class="mb-5">
                 <label class="form-check-label">
@@ -160,6 +162,9 @@ export class CrearTacoFormComponent implements OnInit {
   ) {
     this.form = this.formBuilder.group<ITacoForm>({
       tortilla: this.formBuilder.group({
+        id: new FormControl<number>(0, {
+          nonNullable: true,
+        }),
         nombre: new FormControl<string>('', {
           nonNullable: true,
           validators: [Validators.required, Validators.minLength(2)],
@@ -197,11 +202,17 @@ export class CrearTacoFormComponent implements OnInit {
     this.fillSalsasList();
   }
 
+  // TODO: no pasar id ni precio, esto es la orden de delivery y esos campos deben ser manejados por el backend
   onSubmit() {
     if (this.form.valid) {
       const formValue = this.form.value;
+      if (!formValue.tortilla) {
+        console.log('error al obtener el formulario');
+        return;
+      }
       const tortilla: ITacoContent = {
-        nombre: formValue.tortilla!.nombre!,
+        id: formValue.tortilla.id!,
+        nombre: formValue.tortilla.nombre!,
         precio: 2,
       };
       const alimentos = this.alimentosList

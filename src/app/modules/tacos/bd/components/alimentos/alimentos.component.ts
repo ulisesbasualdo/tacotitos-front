@@ -29,13 +29,13 @@ import { TacosService } from '../../../../../services/data/tacos.service';
           </td>
           <td><ui-btn icon="plus" /></td>
         </tr>
-        @for (item of alimentos; track item.id; let i = $index) {
+        @for (item of alimentos; track item.id) {
           <tr>
             @if (!item.editMode) {
               <td>{{ item.nombre }}</td>
               <td>{{ item.precio }}</td>
               <td>
-                <ui-btn (click)="habilitarEditar(i)" icon="pen" />
+                <ui-btn (click)="habilitarEditar(item.id)" icon="pen" />
                 <ui-btn icon="save" /> <ui-btn icon="trash" />
               </td>
             } @else {
