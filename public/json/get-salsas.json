@@ -1,0 +1,32 @@
+[
+  {
+    "id": 0,
+    "tipoAlimento": "salsa",
+    "nombre": "tomate",
+    "precio": 2
+  },
+  {
+    "id": 1,
+    "tipoAlimento": "salsa",
+    "nombre": "cheddar",
+    "precio": 4.5
+  },
+  {
+    "id": 2,
+    "tipoAlimento": "salsa",
+    "nombre": "blanca",
+    "precio": 4.5
+  },
+  {
+    "id": 3,
+    "tipoAlimento": "salsa",
+    "nombre": "golf",
+    "precio": 4.5
+  },
+  {
+    "id": 6,
+    "nombre": "Limón",
+    "precio": 1.5,
+    "tipoAlimento": "salsa"
+  }
+]

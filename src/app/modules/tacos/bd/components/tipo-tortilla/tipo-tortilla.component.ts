@@ -68,7 +68,7 @@ export class TipoTortillaComponent implements OnInit {
   public tiposTortilla: ITortillaEditable[] = [];
 
   habilitarEditar(id: number): void {
-    this.tiposTortilla.forEach(item => {
+    this.tiposTortilla?.forEach(item => {
       if (item.id === id) {
         item.editMode = true;
       } else {
@@ -80,13 +80,21 @@ export class TipoTortillaComponent implements OnInit {
   constructor(private readonly tacoService: TacosService) {}
 
   ngOnInit(): void {
-    this.tacoService.getTortillas().subscribe((tortillas: ITacoContent[]) => {
-      for (const tortilla of tortillas) {
-        this.tiposTortilla.push({
-          ...tortilla,
-          editMode: false,
-        });
-      }
-    });
+    this.tacoService
+      .getTortillas()
+      .subscribe((tortillas: ITacoContent[] | null) => {
+        if (!tortillas) {
+          console.log('error al obtener las tortillas');
+          return;
+        }
+        console.log({ tortillas });
+
+        for (const tortilla of tortillas) {
+          this.tiposTortilla?.push({
+            ...tortilla,
+            editMode: false,
+          });
+        }
+      });
   }
 }

@@ -1,6 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BtnComponent } from '../../../../../ui/atoms/btn/btn.component';
-import { IAlimentoEditable } from '../../../../../interfaces/definitions';
+import {
+  IAlimento,
+  IAlimentoEditable,
+} from '../../../../../interfaces/definitions';
+import { TacosService } from '../../../../../services/data/tacos.service';
 
 @Component({
   selector: 'app-alimentos',
@@ -60,51 +64,8 @@ import { IAlimentoEditable } from '../../../../../interfaces/definitions';
   `,
   styleUrl: '../bd-styles.scss',
 })
-export class AlimentosComponent {
-  public alimentos: IAlimentoEditable[] = [
-    {
-      id: 0,
-      tipoAlimento: 'alimentoTortilla',
-      nombre: 'carne',
-      precio: 3,
-      editMode: false,
-    },
-    {
-      id: 1,
-      tipoAlimento: 'alimentoTortilla',
-      nombre: 'pollo',
-      precio: 2.5,
-      editMode: false,
-    },
-    {
-      id: 2,
-      tipoAlimento: 'alimentoTortilla',
-      nombre: 'pescado',
-      precio: 4,
-      editMode: false,
-    },
-    {
-      id: 3,
-      tipoAlimento: 'alimentoTortilla',
-      nombre: 'frijoles',
-      precio: 1.5,
-      editMode: false,
-    },
-    {
-      id: 4,
-      tipoAlimento: 'alimentoTortilla',
-      nombre: 'queso',
-      precio: 2,
-      editMode: false,
-    },
-    {
-      id: 5,
-      tipoAlimento: 'alimentoTortilla',
-      nombre: 'verduras',
-      precio: 1.8,
-      editMode: false,
-    },
-  ];
+export class AlimentosComponent implements OnInit {
+  public alimentos: IAlimentoEditable[] = [];
 
   habilitarEditar(id: number): void {
     this.alimentos.forEach(item => {
@@ -114,5 +75,22 @@ export class AlimentosComponent {
         item.editMode = false;
       }
     });
+  }
+  constructor(private readonly tacosService: TacosService) {}
+  ngOnInit(): void {
+    this.tacosService
+      .getAlimentos()
+      .subscribe((alimentos: IAlimento[] | null) => {
+        if (!alimentos) {
+          console.log('error al obtener las salsas');
+          return;
+        }
+        for (const alimento of alimentos) {
+          this.alimentos?.push({
+            ...alimento,
+            editMode: false,
+          });
+        }
+      });
   }
 }

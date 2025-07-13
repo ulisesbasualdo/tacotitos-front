@@ -9,33 +9,35 @@ import { TacosService } from '../../../services/data/tacos.service';
   template: `
     <ui-card titleText="Estadísticas" width100>
       <div cardBody>
-        <table class="table">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Valor</th>
-              <th>Tipo Tortilla</th>
-              <th>Salsa</th>
-              <th>Alimentos</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Taco más costoso</td>
-              <td>{{ tacoMasCostoso?.precio || '-' }}</td>
-              <td>{{ tacoMasCostoso?.tortilla?.nombre || '-' }}</td>
-              <td>{{ tacoMasCostoso?.salsa?.nombre || '-' }}</td>
-              <td>{{ getAlimentosTacoCostoso() || '-' }}</td>
-            </tr>
-            <tr>
-              <td>Taco más económico</td>
-              <td>{{ tacoMasEconomico?.precio || '-' }}</td>
-              <td>{{ tacoMasEconomico?.tortilla?.nombre || '-' }}</td>
-              <td>{{ tacoMasEconomico?.salsa?.nombre || '-' }}</td>
-              <td>{{ getAlimentosTacoEconomico() || '-' }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Valor</th>
+                <th>Tipo Tortilla</th>
+                <th>Salsa</th>
+                <th>Alimentos</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Taco más costoso</td>
+                <td>{{ tacoMasCostoso?.precio || '-' }}</td>
+                <td>{{ tacoMasCostoso?.tortilla?.nombre || '-' }}</td>
+                <td>{{ tacoMasCostoso?.salsa?.nombre || '-' }}</td>
+                <td>{{ getAlimentosTacoCostoso() || '-' }}</td>
+              </tr>
+              <tr>
+                <td>Taco más económico</td>
+                <td>{{ tacoMasEconomico?.precio || '-' }}</td>
+                <td>{{ tacoMasEconomico?.tortilla?.nombre || '-' }}</td>
+                <td>{{ tacoMasEconomico?.salsa?.nombre || '-' }}</td>
+                <td>{{ getAlimentosTacoEconomico() || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
       <div cardFooter>
         Valor promedio de un taco:
@@ -43,7 +45,15 @@ import { TacosService } from '../../../services/data/tacos.service';
       </div>
     </ui-card>
   `,
-  styles: ``,
+  styles: `
+    .table-container {
+      overflow-x: auto;
+      width: 100%;
+    }
+    tbody {
+      text-wrap: nowrap;
+    }
+  `,
 })
 export class EstadisticasComponent implements OnInit {
   tacoMasCostoso: ITaco | null = null;

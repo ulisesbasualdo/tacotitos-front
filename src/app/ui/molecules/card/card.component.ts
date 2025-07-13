@@ -84,11 +84,11 @@ import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 
     @media (max-width: 768px) {
       :host {
-        flex: 1 1 calc(50% - 2em);
+        flex: 1 1 calc(100% - 2em);
       }
       .card {
-        width: calc(50% - 2em);
-        flex: 1 1 calc(50% - 2em);
+        width: calc(100% - 2em);
+        flex: 1 1 calc(100% - 2em);
         padding-inline: 1.5rem;
       }
     }

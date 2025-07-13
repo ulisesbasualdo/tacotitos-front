@@ -1,6 +1,10 @@
-import { Component } from '@angular/core';
-import { IAlimentoEditable } from '../../../../../interfaces/definitions';
+import { Component, OnInit } from '@angular/core';
+import {
+  IAlimento,
+  IAlimentoEditable,
+} from '../../../../../interfaces/definitions';
 import { BtnComponent } from '../../../../../ui/atoms/btn/btn.component';
+import { TacosService } from '../../../../../services/data/tacos.service';
 
 @Component({
   selector: 'app-salsas',
@@ -60,44 +64,31 @@ import { BtnComponent } from '../../../../../ui/atoms/btn/btn.component';
   `,
   styleUrl: '../bd-styles.scss',
 })
-export class SalsasComponent {
-  public salsas: IAlimentoEditable[] = [
-    {
-      id: 0,
-      tipoAlimento: 'salsa',
-      nombre: 'tomate',
-      precio: 2,
-      editMode: false,
-    },
-    {
-      id: 1,
-      tipoAlimento: 'salsa',
-      nombre: 'cheddar',
-      precio: 4.5,
-      editMode: false,
-    },
-    {
-      id: 2,
-      tipoAlimento: 'salsa',
-      nombre: 'blanca',
-      precio: 4.5,
-      editMode: false,
-    },
-    {
-      id: 3,
-      tipoAlimento: 'salsa',
-      nombre: 'golf',
-      precio: 4.5,
-      editMode: false,
-    },
-  ];
+export class SalsasComponent implements OnInit {
+  protected salsas: IAlimentoEditable[] = [];
 
   habilitarEditar(id: number): void {
-    this.salsas.forEach(item => {
+    this.salsas?.forEach(item => {
       if (item.id === id) {
         item.editMode = true;
       } else {
         item.editMode = false;
+      }
+    });
+  }
+
+  constructor(private readonly tacosService: TacosService) {}
+  ngOnInit(): void {
+    this.tacosService.getSalsas().subscribe((salsas: IAlimento[] | null) => {
+      if (!salsas) {
+        console.log('error al obtener las salsas');
+        return;
+      }
+      for (const salsa of salsas) {
+        this.salsas?.push({
+          ...salsa,
+          editMode: false,
+        });
       }
     });
   }

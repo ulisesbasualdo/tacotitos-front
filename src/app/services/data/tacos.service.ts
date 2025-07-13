@@ -34,13 +34,23 @@ export class TacosService {
     const url = environment.mockeable ? 'json/get-tacos.json' : API_URL;
     return this.httpClient.get<ITaco[]>(url);
   }
-  getTortillas(): Observable<ITacoContent[]> {
+  getTortillas(): Observable<ITacoContent[] | null> {
     const url = environment.mockeable ? 'json/get-tortillas.json' : API_URL;
-    return this.httpClient.get<ITacoContent[]>(url);
+    return this.httpClient
+      .get<ITacoContent[]>(url)
+      .pipe(catchError(() => of(null)));
   }
-  getAlimentos(): Observable<IAlimento[]> {
+  getSalsas(): Observable<IAlimento[] | null> {
+    const url = environment.mockeable ? 'json/get-salsas.json' : API_URL;
+    return this.httpClient
+      .get<IAlimento[]>(url)
+      .pipe(catchError(() => of(null)));
+  }
+  getAlimentos(): Observable<IAlimento[] | null> {
     const url = environment.mockeable ? 'json/get-alimentos.json' : API_URL;
-    return this.httpClient.get<IAlimento[]>(url);
+    return this.httpClient
+      .get<IAlimento[]>(url)
+      .pipe(catchError(() => of(null)));
   }
 
   createTaco(taco: ITaco): Observable<ITaco> {

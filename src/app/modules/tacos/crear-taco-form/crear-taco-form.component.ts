@@ -194,6 +194,7 @@ export class CrearTacoFormComponent implements OnInit {
     );
     this.fillTortillaList();
     this.fillAlimentoList();
+    this.fillSalsasList();
   }
 
   onSubmit() {
@@ -224,41 +225,51 @@ export class CrearTacoFormComponent implements OnInit {
   }
 
   fillTortillaList() {
-    this.tacosService.getTortillas().subscribe({
-      next: (res: ITacoContent[]) => {
-        res.forEach(tortilla => {
-          this.tortillaList.push(tortilla.nombre);
-        });
-      },
-      error: error => {
-        console.log(error);
-      },
+    this.tacosService.getTortillas().subscribe(tortilla => {
+      if (!tortilla) {
+        console.log('error al obtener tortillas');
+        return;
+      }
+      tortilla.forEach(tortilla => {
+        this.tortillaList.push(tortilla.nombre);
+      });
     });
   }
 
-  fillAlimentoList() {
-    this.tacosService.getAlimentos().subscribe({
-      next: (res: IAlimento[]) => {
-        res.forEach(alimento => {
-          if (alimento.tipoAlimento === 'alimentoTortilla') {
-            this.alimentosList.push({
-              id: alimento.id ?? 0,
-              label: alimento.nombre,
-              value: alimento.nombre,
-              selected: false,
-            });
-          } else if (alimento.tipoAlimento === 'salsa') {
-            this.salsaList.push({
-              id: alimento.id ?? 0,
-              label: alimento.nombre,
-              value: alimento.nombre,
-            });
-          }
-        });
-      },
-      error: error => {
-        console.log(error);
-      },
+  fillAlimentoList(): void {
+    this.tacosService.getAlimentos().subscribe(alimentos => {
+      if (!alimentos) {
+        console.log('error al obtener alimentos');
+        return;
+      }
+      alimentos.forEach(alimento => {
+        if (alimento.tipoAlimento === 'alimentoTortilla') {
+          this.alimentosList.push({
+            id: alimento.id ?? 0,
+            label: alimento.nombre,
+            value: alimento.nombre,
+            selected: false,
+          });
+        }
+      });
+    });
+  }
+
+  fillSalsasList(): void {
+    this.tacosService.getSalsas().subscribe(salsas => {
+      if (!salsas) {
+        console.log('error al obtener alimentos');
+        return;
+      }
+      salsas.forEach(salsa => {
+        if (salsa.tipoAlimento === 'salsa') {
+          this.salsaList.push({
+            id: salsa.id ?? 0,
+            label: salsa.nombre,
+            value: salsa.nombre,
+          });
+        }
+      });
     });
   }
 
