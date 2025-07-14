@@ -56,4 +56,31 @@ export class TacosService {
   createTaco(taco: ITaco): Observable<ITaco> {
     return this.httpClient.post<ITaco>(API_URL, taco);
   }
+  editSalsa(salsa: IAlimento): Observable<IAlimento> {
+    if (environment.mockeable) {
+      return of(salsa);
+    } else {
+      return this.httpClient.put<IAlimento>(`${API_URL}/${salsa.id}`, salsa);
+    }
+  }
+  editAlimento(alimento: IAlimento): Observable<IAlimento> {
+    if (environment.mockeable) {
+      return of(alimento);
+    } else {
+      return this.httpClient.put<IAlimento>(
+        `${API_URL}/${alimento.id}`,
+        alimento
+      );
+    }
+  }
+  editTortilla(tortilla: ITacoContent): Observable<ITacoContent> {
+    if (environment.mockeable) {
+      return of(tortilla);
+    } else {
+      return this.httpClient.put<ITacoContent>(
+        `${API_URL}/${tortilla.id}`,
+        tortilla
+      );
+    }
+  }
 }

@@ -41,12 +41,14 @@ import { TacosService } from '../../../../../services/data/tacos.service';
             } @else {
               <td>
                 <input
+                  #inputNombre
                   type="text"
                   placeholder="ingrese un nombre"
                   [value]="item.nombre" />
               </td>
               <td>
                 <input
+                  #inputPrecio
                   type="text"
                   placeholder="ingrese un precio"
                   class="text-right"
@@ -54,7 +56,12 @@ import { TacosService } from '../../../../../services/data/tacos.service';
               </td>
               <td>
                 <ui-btn (click)="item.editMode = false" icon="times" />
-                <ui-btn icon="save" /> <ui-btn icon="trash" />
+                <ui-btn
+                  icon="save"
+                  (click)="
+                    saveEdit(item, inputNombre.value, inputPrecio.value)
+                  " />
+                <ui-btn icon="trash" />
               </td>
             }
           </tr>
@@ -77,10 +84,10 @@ export class TipoTortillaComponent implements OnInit {
     });
   }
 
-  constructor(private readonly tacoService: TacosService) {}
+  constructor(private readonly tacosService: TacosService) {}
 
   ngOnInit(): void {
-    this.tacoService
+    this.tacosService
       .getTortillas()
       .subscribe((tortillas: ITacoContent[] | null) => {
         if (!tortillas) {
@@ -96,5 +103,17 @@ export class TipoTortillaComponent implements OnInit {
           });
         }
       });
+  }
+  saveEdit(item: ITacoContent, nuevoNombre: string, nuevoPrecio: string): void {
+    item.nombre = nuevoNombre;
+    item.precio = +nuevoPrecio;
+    this.tacosService.editTortilla(item).subscribe((tortilla: ITacoContent) => {
+      this.tiposTortilla = this.tiposTortilla.map(t => {
+        if (t.id === tortilla.id) {
+          return { ...t, ...tortilla, editMode: false };
+        }
+        return t;
+      });
+    });
   }
 }

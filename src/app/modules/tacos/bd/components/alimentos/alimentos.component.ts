@@ -41,12 +41,14 @@ import { TacosService } from '../../../../../services/data/tacos.service';
             } @else {
               <td>
                 <input
+                  #inputNombre
                   type="text"
                   placeholder="ingrese un nombre"
                   [value]="item.nombre" />
               </td>
               <td>
                 <input
+                  #inputPrecio
                   type="text"
                   placeholder="ingrese un precio"
                   class="text-right"
@@ -54,7 +56,12 @@ import { TacosService } from '../../../../../services/data/tacos.service';
               </td>
               <td>
                 <ui-btn (click)="item.editMode = false" icon="times" />
-                <ui-btn icon="save" /> <ui-btn icon="trash" />
+                <ui-btn
+                  icon="save"
+                  (click)="
+                    saveEdit(item, inputNombre.value, inputPrecio.value)
+                  " />
+                <ui-btn icon="trash" />
               </td>
             }
           </tr>
@@ -92,5 +99,17 @@ export class AlimentosComponent implements OnInit {
           });
         }
       });
+  }
+  saveEdit(item: IAlimento, nuevoNombre: string, nuevoPrecio: string): void {
+    item.nombre = nuevoNombre;
+    item.precio = +nuevoPrecio;
+    this.tacosService.editAlimento(item).subscribe((alimento: IAlimento) => {
+      this.alimentos = this.alimentos.map(a => {
+        if (a.id === alimento.id) {
+          return { ...a, ...alimento, editMode: false };
+        }
+        return a;
+      });
+    });
   }
 }
