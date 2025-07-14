@@ -20,14 +20,26 @@ import { TacosService } from '../../../../../services/data/tacos.service';
       </thead>
       <tbody>
         <tr>
-          <td><input type="text" placeholder="ingrese un nombre" /></td>
           <td>
             <input
+              #inputNombreAgregar
+              type="text"
+              placeholder="ingrese un nombre" />
+          </td>
+          <td>
+            <input
+              #inputPrecioAgregar
               type="text"
               placeholder="ingrese un precio"
               class="text-right" />
           </td>
-          <td><ui-btn icon="plus" /></td>
+          <td>
+            <ui-btn
+              icon="plus"
+              (click)="
+                add(inputNombreAgregar.value, inputPrecioAgregar.value)
+              " />
+          </td>
         </tr>
         @for (item of alimentos; track item.id) {
           <tr>
@@ -110,6 +122,16 @@ export class AlimentosComponent implements OnInit {
         }
         return a;
       });
+    });
+  }
+  add(nombre: string, precio: string) {
+    const alimento: Partial<IAlimento> = {
+      nombre: nombre,
+      precio: +precio,
+      tipoAlimento: 'alimentoTortilla',
+    };
+    this.tacosService.addAlimento(alimento).subscribe(alimento => {
+      this.alimentos.unshift({ ...alimento, editMode: false });
     });
   }
 }

@@ -83,4 +83,17 @@ export class TacosService {
       );
     }
   }
+  addAlimento(alimento: Partial<IAlimento>): Observable<IAlimento> {
+    if (environment.mockeable) {
+      const alimentoCompleto: IAlimento = {
+        id: 70,
+        nombre: alimento.nombre ?? '-',
+        precio: alimento.precio ?? 0,
+        tipoAlimento: 'alimentoTortilla',
+      };
+      return of(alimentoCompleto);
+    } else {
+      return this.httpClient.post<IAlimento>(`${API_URL}`, alimento);
+    }
+  }
 }
