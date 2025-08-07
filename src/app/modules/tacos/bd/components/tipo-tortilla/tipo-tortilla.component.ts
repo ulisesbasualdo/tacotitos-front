@@ -20,14 +20,26 @@ import { TacosService } from '../../../../../services/data/tacos.service';
       </thead>
       <tbody>
         <tr>
-          <td><input type="text" placeholder="ingrese un nombre" /></td>
           <td>
             <input
+              type="text"
+              #inputNombreAgregar
+              placeholder="ingrese un nombre" />
+          </td>
+          <td>
+            <input
+              #inputPrecioAgregar
               type="text"
               placeholder="ingrese un precio"
               class="text-right" />
           </td>
-          <td><ui-btn icon="plus" /></td>
+          <td>
+            <ui-btn
+              icon="plus"
+              (click)="
+                add(inputNombreAgregar.value, inputPrecioAgregar.value)
+              " />
+          </td>
         </tr>
         @for (item of tiposTortilla; track item.id) {
           <tr>
@@ -104,6 +116,18 @@ export class TipoTortillaComponent implements OnInit {
         }
       });
   }
+
+  add(nombre: string, precio: string) {
+    const tortilla: Partial<ITacoContent> = {
+      nombre: nombre,
+      precio: +precio,
+    };
+    // Asumiendo que existe un método para agregar tortillas en el servicio
+    this.tacosService.addTortilla(tortilla).subscribe(tortilla => {
+      this.tiposTortilla.unshift({ ...tortilla, editMode: false });
+    });
+  }
+
   saveEdit(item: ITacoContent, nuevoNombre: string, nuevoPrecio: string): void {
     item.nombre = nuevoNombre;
     item.precio = +nuevoPrecio;

@@ -8,84 +8,6 @@
   margin-bottom: 1rem;
 }
 
-// Responsive form - activated with form-responsive class
-.form.form-responsive {
-  .form-row {
-    display: flex;
-    flex-wrap: wrap;
-    margin-right: -5px;
-    margin-left: -5px;
-
-    > .col,
-    > [class*='col-'] {
-      padding-right: 5px;
-      padding-left: 5px;
-    }
-  }
-
-  // Form column layouts
-  [class*='form-col-'] {
-    position: relative;
-    width: 100%;
-    padding-right: 15px;
-    padding-left: 15px;
-  }
-
-  @media (min-width: 576px) {
-    .form-col-sm-1 {
-      flex: 0 0 8.333%;
-      max-width: 8.333%;
-    }
-    .form-col-sm-2 {
-      flex: 0 0 16.666%;
-      max-width: 16.666%;
-    }
-    .form-col-sm-3 {
-      flex: 0 0 25%;
-      max-width: 25%;
-    }
-    .form-col-sm-4 {
-      flex: 0 0 33.333%;
-      max-width: 33.333%;
-    }
-    .form-col-sm-6 {
-      flex: 0 0 50%;
-      max-width: 50%;
-    }
-    .form-col-sm-12 {
-      flex: 0 0 100%;
-      max-width: 100%;
-    }
-  }
-
-  @media (min-width: 992px) {
-    .form-col-lg-1 {
-      flex: 0 0 8.333%;
-      max-width: 8.333%;
-    }
-    .form-col-lg-2 {
-      flex: 0 0 16.666%;
-      max-width: 16.666%;
-    }
-    .form-col-lg-3 {
-      flex: 0 0 25%;
-      max-width: 25%;
-    }
-    .form-col-lg-4 {
-      flex: 0 0 33.333%;
-      max-width: 33.333%;
-    }
-    .form-col-lg-6 {
-      flex: 0 0 50%;
-      max-width: 50%;
-    }
-    .form-col-lg-12 {
-      flex: 0 0 100%;
-      max-width: 100%;
-    }
-  }
-}
-
 // Dark theme for forms
 .form-dark {
   background-color: #212529;
@@ -149,6 +71,15 @@
   &[readonly] {
     background-color: #e9ecef;
     opacity: 1;
+  }
+}
+// Media queries for small screens
+@media (max-width: 576px) {
+  .form-control {
+    font-size: 0.95rem;
+    width: 80%;
+    min-width: 0;
+    max-width: 100%;
   }
 }
 

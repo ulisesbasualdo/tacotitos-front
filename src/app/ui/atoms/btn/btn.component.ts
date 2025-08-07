@@ -28,7 +28,8 @@ type ButtonColor = 'blue' | 'red' | 'green' | 'bgGrayTxtBlue' | 'default';
       [class.disabled]="disabled()"
       [disabled]="disabled()"
       [class.has-icon]="icon()"
-      [class.no-hover]="_noHover()">
+      [class.no-hover]="_noHover()"
+      [class.no-bg]="_noBg()">
       @if (text()) {
         {{ text() }}
       }
@@ -111,7 +112,13 @@ type ButtonColor = 'blue' | 'red' | 'green' | 'bgGrayTxtBlue' | 'default';
     }
     .no-hover {
       &:hover {
-        background-color: transparent;
+        background-color: none;
+      }
+    }
+    .no-bg {
+      background-color: unset;
+      &:hover {
+        background-color: unset;
       }
     }
   `,
@@ -124,4 +131,7 @@ export class BtnComponent {
   public icon = input<'times' | 'trash' | 'pen' | 'plus' | 'save' | null>(null);
   public noHover = input<BooleanInput>(false);
   protected _noHover = computed(() => coerceBooleanProperty(this.noHover()));
+
+  public noBg = input<BooleanInput>(false);
+  protected _noBg = computed(() => coerceBooleanProperty(this.noBg()));
 }

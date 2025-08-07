@@ -9,7 +9,15 @@
 // Direction
 .flex-row {
   flex-direction: row;
+  flex-wrap: wrap;
 }
+
+@media screen and (max-width: 768px) {
+  .flex-row {
+    flex-direction: column;
+  }
+}
+
 .flex-row-reverse {
   flex-direction: row-reverse;
 }

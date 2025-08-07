@@ -1,0 +1,54 @@
+<!-- Ejemplo de uso del componente simple-group-tab con ng-template -->
+
+<!-- En el componente padre TypeScript -->
+<!--
+import { Component, ViewChild, TemplateRef, computed } from '@angular/core';
+import { SimpleGroupTabComponent, SimpleTab } from './simple-group-tab.component';
+
+@Component({
+  selector: 'app-example',
+  imports: [SimpleGroupTabComponent],
+  template: `
+    <!-- Templates para cada tab -->
+<ng-template #tab1>
+  <h3>Dashboard Principal</h3>
+  <p>Aquí puedes ver las métricas principales de tu aplicación.</p>
+  <div class="dashboard-grid">
+    <div class="metric-card">Usuarios activos: 1,234</div>
+    <div class="metric-card">Ventas del mes: $45,678</div>
+  </div>
+</ng-template>
+
+<ng-template #tab2>
+  <h3>Configuración de Usuario</h3>
+  <form>
+    <label>Nombre: <input type="text" value="Juan Pérez" /></label>
+    <label>Email: <input type="email" value="juan@ejemplo.com" /></label>
+    <button type="submit">Guardar cambios</button>
+  </form>
+</ng-template>
+
+<ng-template #tab3>
+  <h3>Reportes y Estadísticas</h3>
+  <p>Visualiza los reportes detallados de tu negocio.</p>
+  <ul>
+    <li>Reporte de ventas mensual</li>
+    <li>Análisis de usuarios</li>
+    <li>Métricas de rendimiento</li>
+  </ul>
+</ng-template>
+
+<!-- Uso del componente -->
+<app-simple-group-tab [tabs]="tabsData()"></app-simple-group-tab>
+` }) export class ExampleComponent { @ViewChild('tab1') tab1Template!:
+TemplateRef<any
+  >; @ViewChild('tab2') tab2Template!: TemplateRef<any
+    >; @ViewChild('tab3') tab3Template!: TemplateRef<any
+      >; tabsData = computed<SimpleTab[]
+        >(() => [ { label: 'Dashboard', template: this.tab1Template }, { label:
+        'Perfil', template: this.tab2Template }, { label: 'Reportes', template:
+        this.tab3Template } ]); } -->
+      </SimpleTab[]></any
+    ></any
+  ></any
+>

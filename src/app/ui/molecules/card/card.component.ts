@@ -36,15 +36,15 @@ import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 
     .card {
       border-radius: 12px;
-      -webkit-box-shadow: 0px 0px 45px 26px rgba(0, 0, 0, 0.09);
-      -moz-box-shadow: 0px 0px 45px 26px rgba(0, 0, 0, 0.09);
-      box-shadow: 0 0 45px 26px rgba(0, 0, 0, 0.0901960784);
       padding: 2em;
       width: calc(33.333% - 2em);
       min-width: 300px;
       box-sizing: border-box;
       // margin: 0;
       flex: 1 1 calc(33.333% - 2em);
+
+      border-style: solid;
+      border-color: lightgray;
 
       .card-header {
         .title {

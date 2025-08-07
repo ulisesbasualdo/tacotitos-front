@@ -1,0 +1,42 @@
+<!-- Ejemplo de uso ultra-simple del componente simple-group-tab -->
+
+<app-simple-group-tab [tabs]="tabsData"></app-simple-group-tab>
+
+<!-- En el componente TypeScript: -->
+<!--
+export class MyComponent {
+  tabsData: TabData[] = [
+    {
+      label: 'Inicio',
+      content: `
+        <h3>Bienvenido al Inicio</h3>
+        <p>Este es el contenido del primer tab.</p>
+        <ul>
+          <li>Elemento 1</li>
+          <li>Elemento 2</li>
+        </ul>
+      `
+    },
+    {
+      label: 'Perfil',
+      content: `
+        <h3>Tu Perfil</h3>
+        <p>Aquí puedes ver y editar tu información personal.</p>
+        <button>Editar Perfil</button>
+      `
+    },
+    {
+      label: 'Configuración',
+      content: `
+        <h3>Configuración</h3>
+        <p>Ajusta las preferencias de la aplicación.</p>
+        <div>
+          <label>
+            <input type="checkbox"> Recibir notificaciones
+          </label>
+        </div>
+      `
+    }
+  ];
+}
+-->

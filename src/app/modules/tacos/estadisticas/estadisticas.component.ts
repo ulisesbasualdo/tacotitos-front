@@ -1,49 +1,42 @@
 import { Component, OnInit } from '@angular/core';
-import { CardComponent } from '../../../ui/molecules/card/card.component';
 import { ITaco } from '../../../interfaces/definitions';
 import { TacosService } from '../../../services/data/tacos.service';
 
 @Component({
   selector: 'app-estadisticas',
-  imports: [CardComponent],
+  imports: [],
   template: `
-    <ui-card titleText="Estadísticas" width100>
-      <div cardBody>
-        <div class="table-container">
-          <table class="table">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Valor</th>
-                <th>Tipo Tortilla</th>
-                <th>Salsa</th>
-                <th>Alimentos</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Taco más costoso</td>
-                <td>{{ tacoMasCostoso?.precio || '-' }}</td>
-                <td>{{ tacoMasCostoso?.tortilla?.nombre || '-' }}</td>
-                <td>{{ tacoMasCostoso?.salsa?.nombre || '-' }}</td>
-                <td>{{ getAlimentosTacoCostoso() || '-' }}</td>
-              </tr>
-              <tr>
-                <td>Taco más económico</td>
-                <td>{{ tacoMasEconomico?.precio || '-' }}</td>
-                <td>{{ tacoMasEconomico?.tortilla?.nombre || '-' }}</td>
-                <td>{{ tacoMasEconomico?.salsa?.nombre || '-' }}</td>
-                <td>{{ getAlimentosTacoEconomico() || '-' }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div cardFooter>
-        Valor promedio de un taco:
-        {{ valorPromedioTaco ? valorPromedioTaco : 'sin datos' }}
-      </div>
-    </ui-card>
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Valor</th>
+            <th>Tipo Tortilla</th>
+            <th>Salsa</th>
+            <th>Alimentos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Taco más costoso</td>
+            <td>{{ tacoMasCostoso?.precio || '-' }}</td>
+            <td>{{ tacoMasCostoso?.tortilla?.nombre || '-' }}</td>
+            <td>{{ tacoMasCostoso?.salsa?.nombre || '-' }}</td>
+            <td>{{ getAlimentosTacoCostoso() || '-' }}</td>
+          </tr>
+          <tr>
+            <td>Taco más económico</td>
+            <td>{{ tacoMasEconomico?.precio || '-' }}</td>
+            <td>{{ tacoMasEconomico?.tortilla?.nombre || '-' }}</td>
+            <td>{{ tacoMasEconomico?.salsa?.nombre || '-' }}</td>
+            <td>{{ getAlimentosTacoEconomico() || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    Valor promedio de un taco:
+    {{ valorPromedioTaco ? valorPromedioTaco : 'sin datos' }}
   `,
   styles: `
     .table-container {

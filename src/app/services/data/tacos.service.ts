@@ -37,7 +37,7 @@ export class TacosService {
   getTortillas(): Observable<ITacoContent[] | null> {
     const url = environment.mockeable ? 'json/get-tortillas.json' : API_URL;
     return this.httpClient
-      .get<ITacoContent[]>(url)
+      .get<ITacoContent[]>(`${url}/tortillas`)
       .pipe(catchError(() => of(null)));
   }
   getSalsas(): Observable<IAlimento[] | null> {
@@ -73,6 +73,23 @@ export class TacosService {
       );
     }
   }
+
+  addTortilla(tortilla: Partial<ITacoContent>): Observable<ITacoContent> {
+    if (environment.mockeable) {
+      const tortillaCompleta: ITacoContent = {
+        id: 70,
+        nombre: tortilla.nombre ?? '-',
+        precio: tortilla.precio ?? 0,
+      };
+      return of(tortillaCompleta);
+    } else {
+      return this.httpClient.post<ITacoContent>(
+        `${API_URL}/tortillas`,
+        tortilla
+      );
+    }
+  }
+
   editTortilla(tortilla: ITacoContent): Observable<ITacoContent> {
     if (environment.mockeable) {
       return of(tortilla);
