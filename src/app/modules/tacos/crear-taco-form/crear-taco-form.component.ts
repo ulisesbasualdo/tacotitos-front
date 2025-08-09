@@ -18,7 +18,7 @@ import { TacosService } from '../../../services/data/tacos.service';
 
 interface ITacoForm {
   tortilla: FormGroup<{
-    id: FormControl<number>;
+    id: FormControl<string>;
     nombre: FormControl<string>;
     tipo: FormControl<'simple' | 'doble'>;
     alimentos: FormControl<string | null>;
@@ -152,13 +152,17 @@ export class CrearTacoFormComponent implements OnInit {
 
   form: FormGroup<ITacoForm>;
 
+  autoIncrementalIdTortillaList = 0;
+  autoIncrementalIdAlimentosList = 0;
+  autoIncrementalIdSalsasList = 0;
+
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly tacosService: TacosService
   ) {
     this.form = this.formBuilder.group<ITacoForm>({
       tortilla: this.formBuilder.group({
-        id: new FormControl<number>(0, {
+        id: new FormControl<string>('0', {
           nonNullable: true,
         }),
         nombre: new FormControl<string>('', {
@@ -215,7 +219,7 @@ export class CrearTacoFormComponent implements OnInit {
         .filter(alimento => alimento.selected)
         .map(alimento => {
           return {
-            id: alimento.id,
+            id: alimento.id.toString(),
             nombre: alimento.label,
             precio: 1,
             tipoAlimento: 'alimentoTortilla',
@@ -252,7 +256,7 @@ export class CrearTacoFormComponent implements OnInit {
       alimentos.forEach(alimento => {
         if (alimento.tipoAlimento === 'alimentoTortilla') {
           this.alimentosList.push({
-            id: alimento.id ?? 0,
+            id: this.autoIncrementalIdTortillaList++,
             label: alimento.nombre,
             value: alimento.nombre,
             selected: false,
@@ -271,7 +275,7 @@ export class CrearTacoFormComponent implements OnInit {
       salsas.forEach(salsa => {
         if (salsa.tipoAlimento === 'salsa') {
           this.salsaList.push({
-            id: salsa.id ?? 0,
+            id: this.autoIncrementalIdSalsasList++,
             label: salsa.nombre,
             value: salsa.nombre,
           });

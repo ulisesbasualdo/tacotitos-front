@@ -48,7 +48,8 @@ import { TacosService } from '../../../../../services/data/tacos.service';
               <td>{{ item.precio }}</td>
               <td>
                 <ui-btn (click)="habilitarEditar(item.id)" icon="pen" />
-                <ui-btn icon="save" /> <ui-btn icon="trash" />
+                <ui-btn icon="save" />
+                <ui-btn icon="trash" (click)="deleteTortilla(item.id)" />
               </td>
             } @else {
               <td>
@@ -73,7 +74,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
                   (click)="
                     saveEdit(item, inputNombre.value, inputPrecio.value)
                   " />
-                <ui-btn icon="trash" />
+                <ui-btn icon="trash" (click)="deleteTortilla(item.id)" />
               </td>
             }
           </tr>
@@ -86,7 +87,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
 export class TipoTortillaComponent implements OnInit {
   public tiposTortilla: ITortillaEditable[] = [];
 
-  habilitarEditar(id: number): void {
+  habilitarEditar(id: string): void {
     this.tiposTortilla?.forEach(item => {
       if (item.id === id) {
         item.editMode = true;
@@ -138,6 +139,18 @@ export class TipoTortillaComponent implements OnInit {
         }
         return t;
       });
+    });
+  }
+
+  deleteTortilla(id: string): void {
+    console.log('hizo clic en delete');
+    this.tacosService.deleteTortilla(id).subscribe({
+      next: () => {
+        this.tiposTortilla = this.tiposTortilla.filter(t => t.id !== id);
+      },
+      error: err => {
+        console.error('Error al eliminar la tortilla:', err);
+      },
     });
   }
 }

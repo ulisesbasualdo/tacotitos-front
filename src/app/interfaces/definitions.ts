@@ -27,7 +27,7 @@ export interface ITaco {
   precio: number;
 }
 export interface ITacoContent {
-  id: number;
+  id: string;
   nombre: string;
   precio: number;
 }

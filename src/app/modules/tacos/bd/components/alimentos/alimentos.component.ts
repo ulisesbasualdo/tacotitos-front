@@ -86,7 +86,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
 export class AlimentosComponent implements OnInit {
   public alimentos: IAlimentoEditable[] = [];
 
-  habilitarEditar(id: number): void {
+  habilitarEditar(id: string): void {
     this.alimentos.forEach(item => {
       if (item.id === id) {
         item.editMode = true;

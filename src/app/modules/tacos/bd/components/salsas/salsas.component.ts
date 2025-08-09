@@ -74,7 +74,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
 export class SalsasComponent implements OnInit {
   protected salsas: IAlimentoEditable[] = [];
 
-  habilitarEditar(id: number): void {
+  habilitarEditar(id: string): void {
     this.salsas?.forEach(item => {
       if (item.id === id) {
         item.editMode = true;

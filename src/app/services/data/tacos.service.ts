@@ -77,7 +77,7 @@ export class TacosService {
   addTortilla(tortilla: Partial<ITacoContent>): Observable<ITacoContent> {
     if (environment.mockeable) {
       const tortillaCompleta: ITacoContent = {
-        id: 70,
+        id: '70',
         nombre: tortilla.nombre ?? '-',
         precio: tortilla.precio ?? 0,
       };
@@ -100,10 +100,19 @@ export class TacosService {
       );
     }
   }
+
+  deleteTortilla(id: string): Observable<void> {
+    if (environment.mockeable) {
+      return of();
+    } else {
+      return this.httpClient.delete<void>(`${API_URL}/tortillas/${id}`);
+    }
+  }
+
   addAlimento(alimento: Partial<IAlimento>): Observable<IAlimento> {
     if (environment.mockeable) {
       const alimentoCompleto: IAlimento = {
-        id: 70,
+        id: '70',
         nombre: alimento.nombre ?? '-',
         precio: alimento.precio ?? 0,
         tipoAlimento: 'alimentoTortilla',
