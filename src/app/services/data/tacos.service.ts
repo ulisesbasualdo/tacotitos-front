@@ -41,13 +41,17 @@ export class TacosService {
       .pipe(catchError(() => of(null)));
   }
   getSalsas(): Observable<IAlimento[] | null> {
-    const url = environment.mockeable ? 'json/get-salsas.json' : API_URL;
+    const url = environment.mockeable
+      ? 'json/get-salsas.json'
+      : `${API_URL}/salsas`;
     return this.httpClient
       .get<IAlimento[]>(url)
       .pipe(catchError(() => of(null)));
   }
   getAlimentos(): Observable<IAlimento[] | null> {
-    const url = environment.mockeable ? 'json/get-alimentos.json' : API_URL;
+    const url = environment.mockeable
+      ? 'json/get-alimentos.json'
+      : `${API_URL}/alimentos`;
     return this.httpClient
       .get<IAlimento[]>(url)
       .pipe(catchError(() => of(null)));
@@ -60,7 +64,10 @@ export class TacosService {
     if (environment.mockeable) {
       return of(salsa);
     } else {
-      return this.httpClient.put<IAlimento>(`${API_URL}/${salsa.id}`, salsa);
+      return this.httpClient.put<IAlimento>(
+        `${API_URL}/salsas/${salsa.id}`,
+        salsa
+      );
     }
   }
   editAlimento(alimento: IAlimento): Observable<IAlimento> {
@@ -68,7 +75,7 @@ export class TacosService {
       return of(alimento);
     } else {
       return this.httpClient.put<IAlimento>(
-        `${API_URL}/${alimento.id}`,
+        `${API_URL}/alimentos/${alimento.id}`,
         alimento
       );
     }
@@ -119,7 +126,37 @@ export class TacosService {
       };
       return of(alimentoCompleto);
     } else {
-      return this.httpClient.post<IAlimento>(`${API_URL}`, alimento);
+      return this.httpClient.post<IAlimento>(`${API_URL}/alimentos`, alimento);
+    }
+  }
+
+  deleteAlimento(id: string): Observable<void> {
+    if (environment.mockeable) {
+      return of();
+    } else {
+      return this.httpClient.delete<void>(`${API_URL}/alimentos/${id}`);
+    }
+  }
+
+  addSalsa(salsa: Partial<IAlimento>): Observable<IAlimento> {
+    if (environment.mockeable) {
+      const salsaCompleta: IAlimento = {
+        id: '70',
+        nombre: salsa.nombre ?? '-',
+        precio: salsa.precio ?? 0,
+        tipoAlimento: 'salsa',
+      };
+      return of(salsaCompleta);
+    } else {
+      return this.httpClient.post<IAlimento>(`${API_URL}/salsas`, salsa);
+    }
+  }
+
+  deleteSalsa(id: string): Observable<void> {
+    if (environment.mockeable) {
+      return of();
+    } else {
+      return this.httpClient.delete<void>(`${API_URL}/salsas/${id}`);
     }
   }
 }

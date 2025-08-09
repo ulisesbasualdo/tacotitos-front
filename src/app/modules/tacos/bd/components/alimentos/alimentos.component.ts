@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { BtnComponent } from '../../../../../ui/atoms/btn/btn.component';
 import {
   IAlimento,
@@ -37,18 +37,24 @@ import { TacosService } from '../../../../../services/data/tacos.service';
             <ui-btn
               icon="plus"
               (click)="
-                add(inputNombreAgregar.value, inputPrecioAgregar.value)
+                add(
+                  inputNombreAgregar.value,
+                  inputPrecioAgregar.value,
+                  inputNombreAgregar,
+                  inputPrecioAgregar
+                )
               " />
           </td>
         </tr>
-        @for (item of alimentos; track item.id) {
+        @for (item of alimentos(); track item.id) {
           <tr>
             @if (!item.editMode) {
               <td>{{ item.nombre }}</td>
               <td>{{ item.precio }}</td>
               <td>
                 <ui-btn (click)="habilitarEditar(item.id)" icon="pen" />
-                <ui-btn icon="save" /> <ui-btn icon="trash" />
+                <ui-btn icon="save" />
+                <ui-btn icon="trash" (click)="deleteAlimento(item.id)" />
               </td>
             } @else {
               <td>
@@ -73,7 +79,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
                   (click)="
                     saveEdit(item, inputNombre.value, inputPrecio.value)
                   " />
-                <ui-btn icon="trash" />
+                <ui-btn icon="trash" (click)="deleteAlimento(item.id)" />
               </td>
             }
           </tr>
@@ -84,16 +90,15 @@ import { TacosService } from '../../../../../services/data/tacos.service';
   styleUrl: '../bd-styles.scss',
 })
 export class AlimentosComponent implements OnInit {
-  public alimentos: IAlimentoEditable[] = [];
+  protected alimentos = signal<IAlimentoEditable[]>([]);
 
   habilitarEditar(id: string): void {
-    this.alimentos.forEach(item => {
-      if (item.id === id) {
-        item.editMode = true;
-      } else {
-        item.editMode = false;
-      }
-    });
+    this.alimentos.update(items =>
+      items.map(item => ({
+        ...item,
+        editMode: item.id === id,
+      }))
+    );
   }
   constructor(private readonly tacosService: TacosService) {}
   ngOnInit(): void {
@@ -104,34 +109,58 @@ export class AlimentosComponent implements OnInit {
           console.log('error al obtener las salsas');
           return;
         }
-        for (const alimento of alimentos) {
-          this.alimentos?.push({
+        this.alimentos.set(
+          alimentos.map(alimento => ({
             ...alimento,
             editMode: false,
-          });
-        }
+          }))
+        );
       });
   }
   saveEdit(item: IAlimento, nuevoNombre: string, nuevoPrecio: string): void {
     item.nombre = nuevoNombre;
     item.precio = +nuevoPrecio;
     this.tacosService.editAlimento(item).subscribe((alimento: IAlimento) => {
-      this.alimentos = this.alimentos.map(a => {
-        if (a.id === alimento.id) {
-          return { ...a, ...alimento, editMode: false };
-        }
-        return a;
-      });
+      this.alimentos.update(items =>
+        items.map(a => {
+          if (a.id === alimento.id) {
+            return { ...a, ...alimento, editMode: false };
+          }
+          return a;
+        })
+      );
     });
   }
-  add(nombre: string, precio: string) {
+  add(
+    nombre: string,
+    precio: string,
+    inputNombre: HTMLInputElement,
+    inputPrecio: HTMLInputElement
+  ) {
     const alimento: Partial<IAlimento> = {
       nombre: nombre,
       precio: +precio,
       tipoAlimento: 'alimentoTortilla',
     };
     this.tacosService.addAlimento(alimento).subscribe(alimento => {
-      this.alimentos.unshift({ ...alimento, editMode: false });
+      this.alimentos.update(items => [
+        { ...alimento, editMode: false },
+        ...items,
+      ]);
+      inputNombre.value = '';
+      inputPrecio.value = '';
+    });
+  }
+
+  deleteAlimento(id: string): void {
+    console.log('hizo clic en delete');
+    this.tacosService.deleteAlimento(id).subscribe({
+      next: () => {
+        this.alimentos.update(items => items.filter(a => a.id !== id));
+      },
+      error: err => {
+        console.error('Error al eliminar el alimento:', err);
+      },
     });
   }
 }
