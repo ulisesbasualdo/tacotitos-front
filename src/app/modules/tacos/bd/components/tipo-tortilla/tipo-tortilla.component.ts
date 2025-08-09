@@ -107,8 +107,6 @@ export class TipoTortillaComponent implements OnInit {
           console.log('error al obtener las tortillas');
           return;
         }
-        console.log({ tortillas });
-
         for (const tortilla of tortillas) {
           this.tiposTortilla?.push({
             ...tortilla,
@@ -123,7 +121,6 @@ export class TipoTortillaComponent implements OnInit {
       nombre: nombre,
       precio: +precio,
     };
-    // Asumiendo que existe un método para agregar tortillas en el servicio
     this.tacosService.addTortilla(tortilla).subscribe(tortilla => {
       this.tiposTortilla.unshift({ ...tortilla, editMode: false });
     });

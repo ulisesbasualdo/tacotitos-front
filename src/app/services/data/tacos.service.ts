@@ -95,7 +95,7 @@ export class TacosService {
       return of(tortilla);
     } else {
       return this.httpClient.put<ITacoContent>(
-        `${API_URL}/${tortilla.id}`,
+        `${API_URL}/tortillas/${tortilla.id}`,
         tortilla
       );
     }
