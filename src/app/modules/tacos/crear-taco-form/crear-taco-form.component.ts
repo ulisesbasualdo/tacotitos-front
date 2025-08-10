@@ -1,4 +1,4 @@
-import { Component, OnInit, output } from '@angular/core';
+import { Component, inject, OnInit, output } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -100,9 +100,12 @@ interface ITacoForm {
               formControlName="nombre"
               id="tortillaNombre"
               required>
-              @for (tortilla of tortillaList; track $index) {
+              @for (
+                tortilla of tacosService.getTortillas.value();
+                track $index
+              ) {
                 <option [value]="tortilla">
-                  {{ tortilla }}
+                  {{ tortilla.nombre }}
                 </option>
               }
             </select>
@@ -142,6 +145,8 @@ interface ITacoForm {
   styles: ``,
 })
 export class CrearTacoFormComponent implements OnInit {
+  tacosService = inject(TacosService);
+
   tortillaList: string[] = [];
 
   alimentosList: ISelectMultiple[] = [];
@@ -156,10 +161,7 @@ export class CrearTacoFormComponent implements OnInit {
   autoIncrementalIdAlimentosList = 0;
   autoIncrementalIdSalsasList = 0;
 
-  constructor(
-    private readonly formBuilder: FormBuilder,
-    private readonly tacosService: TacosService
-  ) {
+  constructor(private readonly formBuilder: FormBuilder) {
     this.form = this.formBuilder.group<ITacoForm>({
       tortilla: this.formBuilder.group({
         id: new FormControl<string>('0', {
@@ -197,7 +199,7 @@ export class CrearTacoFormComponent implements OnInit {
         }
       }
     );
-    this.fillTortillaList();
+    // this.fillTortillaList();
     this.fillAlimentoList();
     this.fillSalsasList();
   }
@@ -233,18 +235,6 @@ export class CrearTacoFormComponent implements OnInit {
       this.submitTaco.emit(taco);
       this.form.reset();
     }
-  }
-
-  fillTortillaList() {
-    this.tacosService.getTortillas().subscribe(tortilla => {
-      if (!tortilla) {
-        console.log('error al obtener tortillas');
-        return;
-      }
-      tortilla.forEach(tortilla => {
-        this.tortillaList.push(tortilla.nombre);
-      });
-    });
   }
 
   fillAlimentoList(): void {

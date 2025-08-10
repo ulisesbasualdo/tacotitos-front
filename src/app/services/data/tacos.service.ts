@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, httpResource } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ITaco, IAlimento, ITacoContent } from '../../interfaces/definitions';
 import { catchError, Observable, of } from 'rxjs';
@@ -34,12 +34,9 @@ export class TacosService {
     const url = environment.mockeable ? 'json/get-tacos.json' : API_URL;
     return this.httpClient.get<ITaco[]>(url);
   }
-  getTortillas(): Observable<ITacoContent[] | null> {
-    const url = environment.mockeable ? 'json/get-tortillas.json' : API_URL;
-    return this.httpClient
-      .get<ITacoContent[]>(`${url}/tortillas`)
-      .pipe(catchError(() => of(null)));
-  }
+
+  getTortillas = httpResource<ITacoContent[]>(() => `${API_URL}/tortillas`);
+
   getSalsas(): Observable<IAlimento[] | null> {
     const url = environment.mockeable
       ? 'json/get-salsas.json'
