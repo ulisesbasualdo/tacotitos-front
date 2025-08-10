@@ -49,7 +49,7 @@ interface ITacoForm {
                 type="radio"
                 formControlName="tipo"
                 value="simple" />
-              Tortilla simple
+              Tortilla simple (precio base)
             </label>
             <label class="form-check-label">
               <input
@@ -57,7 +57,7 @@ interface ITacoForm {
                 type="radio"
                 formControlName="tipo"
                 value="doble" />
-              Tortilla doble
+              Tortilla doble (x2 precio tortilla)
             </label>
           </div>
 
@@ -131,9 +131,9 @@ interface ITacoForm {
               formControlName="salsa"
               name="salsa"
               id="salsa">
-              @for (salsa of salsaList; track $index) {
-                <option [value]="salsa.value">
-                  {{ salsa.label }}
+              @for (salsa of salsasResource.value(); track salsa.id) {
+                <option [ngValue]="salsa">
+                  {{ salsa.nombre }}
                 </option>
               }
             </select>
@@ -191,6 +191,15 @@ export class CrearTacoFormComponent implements OnInit {
     this.form.controls.tortilla.controls.nombre.valueChanges,
     { initialValue: this.form.controls.tortilla.controls.nombre.value }
   );
+  private readonly tipoTortillaSeleccionado = toSignal(
+    this.form.controls.tortilla.controls.tipo.valueChanges,
+    { initialValue: this.form.controls.tortilla.controls.tipo.value }
+  );
+
+  private readonly salsaSeleccionada = toSignal(
+    this.form.controls.tortilla.controls.salsa.valueChanges,
+    { initialValue: this.form.controls.tortilla.controls.salsa.value }
+  );
   tortillaPrice = computed(() => this._tortillaSeleccionada()?.precio ?? 0);
   alimentosPrice = computed(() =>
     this.alimentosSelecteds().reduce(
@@ -198,11 +207,28 @@ export class CrearTacoFormComponent implements OnInit {
       0
     )
   );
-  totalPrice = computed(() => this.tortillaPrice() + this.alimentosPrice());
-
+  protected readonly salsaPrice = computed(
+    () => this.salsaSeleccionada()?.precio ?? 0
+  );
+  protected readonly totalPrice = computed(
+    () => this.tortillaTotalPrice() + this.alimentosPrice() + this.salsaPrice()
+  );
   alimentosSelecteds = signal<IAlimento[]>([]);
   alimentosResource = httpResource<IAlimento[]>(() => `${API_URL}/alimentos`);
+  protected readonly salsasResource = httpResource<IAlimento[]>(
+    () => `${API_URL}/salsas`
+  );
+  protected readonly baseTortillaPrice = computed(
+    () => this._tortillaSeleccionada()?.precio ?? 0
+  );
 
+  protected readonly tipoMultiplicador = computed(() =>
+    this.tipoTortillaSeleccionado() === 'doble' ? 2 : 1
+  );
+
+  protected readonly tortillaTotalPrice = computed(
+    () => this.baseTortillaPrice() * this.tipoMultiplicador()
+  );
   salsaList: ISelectSimple[] = [];
   submitTaco = output<ITaco>();
 
@@ -211,7 +237,6 @@ export class CrearTacoFormComponent implements OnInit {
   autoIncrementalIdSalsasList = 0;
 
   ngOnInit(): void {
-    this.fillSalsasList();
     this.form.controls.tortilla.controls.alimentos.valueChanges.subscribe(
       changes => {
         this.setSelected(changes);
@@ -247,24 +272,6 @@ export class CrearTacoFormComponent implements OnInit {
 
   onSubmit() {
     console.log('enviado');
-  }
-
-  fillSalsasList(): void {
-    this.tacosService.getSalsas().subscribe(salsas => {
-      if (!salsas) {
-        console.log('error al obtener alimentos');
-        return;
-      }
-      salsas.forEach(salsa => {
-        if (salsa.tipoAlimento === 'salsa') {
-          this.salsaList.push({
-            id: this.autoIncrementalIdSalsasList++,
-            label: salsa.nombre,
-            value: salsa.nombre,
-          });
-        }
-      });
-    });
   }
 
   limpiarAlimentosSelected() {
