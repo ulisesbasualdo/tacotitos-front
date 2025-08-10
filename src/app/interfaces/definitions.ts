@@ -26,6 +26,14 @@ export interface ITaco {
   alimentos: IAlimento[];
   precio: number;
 }
+
+export interface ITacoStats {
+  valor: number | null;
+  tipoTortilla: string | null;
+  salsa: string | null;
+  alimentos: string[] | null;
+}
+
 export interface ITacoContent {
   id: string;
   nombre: string;

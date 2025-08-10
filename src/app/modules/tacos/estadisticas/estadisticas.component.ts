@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ITaco } from '../../../interfaces/definitions';
 import { TacosService } from '../../../services/data/tacos.service';
 
@@ -27,10 +27,32 @@ import { TacosService } from '../../../services/data/tacos.service';
           </tr>
           <tr>
             <td>Taco más económico</td>
-            <td>{{ tacoMasEconomico?.precio || '-' }}</td>
-            <td>{{ tacoMasEconomico?.tortilla?.nombre || '-' }}</td>
-            <td>{{ tacoMasEconomico?.salsa?.nombre || '-' }}</td>
-            <td>{{ getAlimentosTacoEconomico() || '-' }}</td>
+
+            @if (tacosService.getTacoMasEconomico.hasValue()) {
+              <td>
+                {{ tacosService.getTacoMasEconomico.value().valor || '-' }}
+              </td>
+              <td>
+                {{
+                  tacosService.getTacoMasEconomico.value().tipoTortilla || '-'
+                }}
+              </td>
+              <td>
+                {{ tacosService.getTacoMasEconomico.value().salsa || '-' }}
+              </td>
+              <td>
+                {{ tacosService.getTacoMasEconomico.value().alimentos || '-' }}
+              </td>
+            }
+            @if (
+              tacosService.getTacoMasEconomico.error() &&
+              !tacosService.getTacoMasEconomico.isLoading()
+            ) {
+              <td>error al obtener el taco más económico</td>
+            }
+            @if (tacosService.getTacoMasEconomico.isLoading()) {
+              <td>Cargando...</td>
+            }
           </tr>
         </tbody>
       </table>
@@ -53,7 +75,9 @@ export class EstadisticasComponent implements OnInit {
   tacoMasEconomico: ITaco | null = null;
   valorPromedioTaco: number | null = null;
 
-  constructor(private readonly tacosService: TacosService) {}
+  tacosService = inject(TacosService);
+
+  // constructor(private readonly tacosService: TacosService) {}
   ngOnInit(): void {
     this.tacosService.getTacoMasCostoso().subscribe(taco => {
       if (!taco) {
@@ -62,13 +86,13 @@ export class EstadisticasComponent implements OnInit {
       }
       this.tacoMasCostoso = taco;
     });
-    this.tacosService.getTacoMasEconomico().subscribe(taco => {
-      if (!taco) {
-        console.log('no se pudo obtener el taco más económico');
-        return;
-      }
-      this.tacoMasEconomico = taco;
-    });
+    // this.tacosService.getTacoMasEconomico().subscribe(taco => {
+    //   if (!taco) {
+    //     console.log('no se pudo obtener el taco más económico');
+    //     return;
+    //   }
+    //   this.tacoMasEconomico = taco;
+    // });
     this.tacosService.getValorPromedio().subscribe(valor => {
       if (!valor) {
         console.log('no se pudo obtener el valor promedio');
