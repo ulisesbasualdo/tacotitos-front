@@ -1,10 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { ITaco } from '../../../interfaces/definitions';
-import { TacosService } from '../../../services/data/tacos.service';
+import { Component } from '@angular/core';
+import { ITacoStats } from '../../../interfaces/definitions';
+import { API_URL } from '../../../services/data/tacos.service';
+import { httpResource } from '@angular/common/http';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-estadisticas',
-  imports: [],
+  imports: [DecimalPipe],
   template: `
     <div class="table-container">
       <table class="table">
@@ -20,37 +22,45 @@ import { TacosService } from '../../../services/data/tacos.service';
         <tbody>
           <tr>
             <td>Taco más costoso</td>
-            <td>{{ tacoMasCostoso?.precio || '-' }}</td>
-            <td>{{ tacoMasCostoso?.tortilla?.nombre || '-' }}</td>
-            <td>{{ tacoMasCostoso?.salsa?.nombre || '-' }}</td>
-            <td>{{ getAlimentosTacoCostoso() || '-' }}</td>
+            @if (expensiveTacoResource.hasValue()) {
+              <td>
+                {{
+                  (expensiveTacoResource.value().valor | number: '1.2-2') || '-'
+                }}
+              </td>
+              <td>{{ expensiveTacoResource.value().tipoTortilla || '-' }}</td>
+              <td>{{ expensiveTacoResource.value().salsa || '-' }}</td>
+              <td>{{ expensiveTacoResource.value().alimentos || '-' }}</td>
+            }
+            @if (
+              expensiveTacoResource.error() &&
+              !expensiveTacoResource.isLoading()
+            ) {
+              <td>error al obtener el taco más costoso</td>
+            }
+            @if (expensiveTacoResource.isLoading()) {
+              <td>Cargando...</td>
+            }
           </tr>
           <tr>
             <td>Taco más económico</td>
 
-            @if (tacosService.getTacoMasEconomico.hasValue()) {
-              <td>
-                {{ tacosService.getTacoMasEconomico.value().valor || '-' }}
-              </td>
+            @if (cheapestTacoResource.hasValue()) {
               <td>
                 {{
-                  tacosService.getTacoMasEconomico.value().tipoTortilla || '-'
+                  (cheapestTacoResource.value().valor | number: '1.2-2') || '-'
                 }}
               </td>
-              <td>
-                {{ tacosService.getTacoMasEconomico.value().salsa || '-' }}
-              </td>
-              <td>
-                {{ tacosService.getTacoMasEconomico.value().alimentos || '-' }}
-              </td>
+              <td>{{ cheapestTacoResource.value().tipoTortilla || '-' }}</td>
+              <td>{{ cheapestTacoResource.value().salsa || '-' }}</td>
+              <td>{{ cheapestTacoResource.value().alimentos || '-' }}</td>
             }
             @if (
-              tacosService.getTacoMasEconomico.error() &&
-              !tacosService.getTacoMasEconomico.isLoading()
+              cheapestTacoResource.error() && !cheapestTacoResource.isLoading()
             ) {
               <td>error al obtener el taco más económico</td>
             }
-            @if (tacosService.getTacoMasEconomico.isLoading()) {
+            @if (cheapestTacoResource.isLoading()) {
               <td>Cargando...</td>
             }
           </tr>
@@ -58,7 +68,11 @@ import { TacosService } from '../../../services/data/tacos.service';
       </table>
     </div>
     Valor promedio de un taco:
-    {{ valorPromedioTaco ? valorPromedioTaco : 'sin datos' }}
+    {{
+      averageTacoResource.hasValue()
+        ? (averageTacoResource.value() | number: '1.2-2')
+        : 'sin datos'
+    }}
   `,
   styles: `
     .table-container {
@@ -70,45 +84,15 @@ import { TacosService } from '../../../services/data/tacos.service';
     }
   `,
 })
-export class EstadisticasComponent implements OnInit {
-  tacoMasCostoso: ITaco | null = null;
-  tacoMasEconomico: ITaco | null = null;
-  valorPromedioTaco: number | null = null;
+export class EstadisticasComponent {
+  cheapestTacoResource = httpResource<ITacoStats>(
+    () => `${API_URL}/stats/cheapest`
+  );
+  expensiveTacoResource = httpResource<ITacoStats>(
+    () => `${API_URL}/stats/most-expensive`
+  );
 
-  tacosService = inject(TacosService);
-
-  // constructor(private readonly tacosService: TacosService) {}
-  ngOnInit(): void {
-    this.tacosService.getTacoMasCostoso().subscribe(taco => {
-      if (!taco) {
-        console.log('no se pudo obtener el taco más costoso');
-        return;
-      }
-      this.tacoMasCostoso = taco;
-    });
-    // this.tacosService.getTacoMasEconomico().subscribe(taco => {
-    //   if (!taco) {
-    //     console.log('no se pudo obtener el taco más económico');
-    //     return;
-    //   }
-    //   this.tacoMasEconomico = taco;
-    // });
-    this.tacosService.getValorPromedio().subscribe(valor => {
-      if (!valor) {
-        console.log('no se pudo obtener el valor promedio');
-        return;
-      }
-      this.valorPromedioTaco = valor;
-    });
-  }
-
-  getAlimentosTacoCostoso(): string {
-    return this.tacoMasCostoso?.alimentos?.map(a => a.nombre).join(', ') || '-';
-  }
-
-  getAlimentosTacoEconomico(): string {
-    return (
-      this.tacoMasEconomico?.alimentos?.map(a => a.nombre).join(', ') || '-'
-    );
-  }
+  averageTacoResource = httpResource<number>(
+    () => `${API_URL}/stats/average-price`
+  );
 }
