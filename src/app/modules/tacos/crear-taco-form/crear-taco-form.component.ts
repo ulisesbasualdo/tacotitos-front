@@ -1,4 +1,11 @@
-import { Component, inject, OnInit, output } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnInit,
+  output,
+  signal,
+} from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -11,18 +18,19 @@ import {
   ITaco,
   ITacoContent,
   IAlimento,
-  ISelectMultiple,
   ISelectSimple,
 } from '../../../interfaces/definitions';
-import { TacosService } from '../../../services/data/tacos.service';
+import { API_URL, TacosService } from '../../../services/data/tacos.service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { httpResource } from '@angular/common/http';
 
 interface ITacoForm {
   tortilla: FormGroup<{
     id: FormControl<string>;
-    nombre: FormControl<string>;
+    nombre: FormControl<ITacoContent | null>;
     tipo: FormControl<'simple' | 'doble'>;
-    alimentos: FormControl<string | null>;
-    salsa: FormControl<string | null>;
+    alimentos: FormControl<IAlimento | null>;
+    salsa: FormControl<IAlimento | null>;
   }>;
 }
 
@@ -52,6 +60,9 @@ interface ITacoForm {
               Tortilla doble
             </label>
           </div>
+
+          <!-- ALIMENTOS -->
+
           <div class="container-alimentos mb-3">
             <label class="form-label " for="tortillaAlimentos"
               >Alimentos:</label
@@ -61,12 +72,12 @@ interface ITacoForm {
               formControlName="alimentos"
               name="tortillaAlimentos"
               id="tortillaAlimentos">
-              @for (alimento of alimentosList; track alimento.id) {
-                <option [value]="alimento.value">
-                  @if (alimento.selected) {
-                    {{ alimento.label }} ✓
+              @for (alimento of alimentosResource.value(); track $index) {
+                <option [ngValue]="alimento" #optionAlimento>
+                  @if (isAlimentoSelected(alimento)) {
+                    {{ alimento.nombre }} ✓
                   } @else {
-                    {{ alimento.label }}
+                    {{ alimento.nombre }}
                   }
                 </option>
               }
@@ -75,40 +86,43 @@ interface ITacoForm {
           <div>
             Alimentos seleccionados:
             <ul class="d-flex flex-row">
-              @for (alimento of alimentosList; track alimento.id) {
-                @if (alimento.selected) {
-                  <li class="d-flex align-items-baseline">
-                    {{ alimento.label
-                    }}<ui-btn
-                      (click)="alimento.selected = false"
-                      icon="times"
-                      noBg />
-                  </li>
-                }
+              @for (alimento of alimentosSelecteds(); track $index) {
+                <li class="d-flex align-items-baseline">
+                  {{ alimento.nombre
+                  }}<ui-btn
+                    (click)="unsetSelected(alimento)"
+                    icon="times"
+                    noBg />
+                </li>
               }
             </ul>
           </div>
         </div>
+
+        <!-- FIN ALIMENTOS -->
 
         <div class="row d-flex flex-row gap-5 align-items-baseline">
           <div>
             <label class="form-label" for="tortillaNombre"
               >Tipo de tortilla:</label
             >
-            <select
-              class="form-control"
-              formControlName="nombre"
-              id="tortillaNombre"
-              required>
-              @for (
-                tortilla of tacosService.getTortillas.value();
-                track $index
-              ) {
-                <option [value]="tortilla">
-                  {{ tortilla.nombre }}
-                </option>
-              }
-            </select>
+            @if (tacosService.getTortillas.hasValue()) {
+              <select
+                class="form-control"
+                formControlName="nombre"
+                id="tortillaNombre"
+                required>
+                @for (
+                  tortilla of tacosService.getTortillas.value();
+                  track $index;
+                  let i = $index
+                ) {
+                  <option #tortillaOption [ngValue]="tortilla">
+                    {{ tortilla.nombre }}
+                  </option>
+                }
+              </select>
+            }
           </div>
           <div class="container-salsa">
             <label class="form-label" for="salsa">Salsa:</label>
@@ -139,6 +153,7 @@ interface ITacoForm {
           type="submit"
           [disabled]="form.invalid">
         </ui-btn>
+        <div>precio: {{ totalPrice() }}</div>
       </div>
     </form>
   `,
@@ -146,114 +161,92 @@ interface ITacoForm {
 })
 export class CrearTacoFormComponent implements OnInit {
   tacosService = inject(TacosService);
+  formBuilder = inject(FormBuilder);
 
-  tortillaList: string[] = [];
+  form: FormGroup<ITacoForm> = this.formBuilder.group<ITacoForm>({
+    tortilla: this.formBuilder.group({
+      id: new FormControl<string>('0', {
+        nonNullable: true,
+      }),
+      nombre: new FormControl<ITacoContent | null>(null, {
+        nonNullable: false,
+        validators: [Validators.required],
+      }),
+      tipo: new FormControl<'simple' | 'doble'>('simple', {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      alimentos: new FormControl<IAlimento | null>(null, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      salsa: new FormControl<IAlimento | null>(null, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+    }),
+  });
 
-  alimentosList: ISelectMultiple[] = [];
+  private readonly _tortillaSeleccionada = toSignal(
+    this.form.controls.tortilla.controls.nombre.valueChanges,
+    { initialValue: this.form.controls.tortilla.controls.nombre.value }
+  );
+  tortillaPrice = computed(() => this._tortillaSeleccionada()?.precio ?? 0);
+  alimentosPrice = computed(() =>
+    this.alimentosSelecteds().reduce(
+      (total, alimento) => total + alimento.precio,
+      0
+    )
+  );
+  totalPrice = computed(() => this.tortillaPrice() + this.alimentosPrice());
+
+  alimentosSelecteds = signal<IAlimento[]>([]);
+  alimentosResource = httpResource<IAlimento[]>(() => `${API_URL}/alimentos`);
 
   salsaList: ISelectSimple[] = [];
-
   submitTaco = output<ITaco>();
-
-  form: FormGroup<ITacoForm>;
 
   autoIncrementalIdTortillaList = 0;
   autoIncrementalIdAlimentosList = 0;
   autoIncrementalIdSalsasList = 0;
 
-  constructor(private readonly formBuilder: FormBuilder) {
-    this.form = this.formBuilder.group<ITacoForm>({
-      tortilla: this.formBuilder.group({
-        id: new FormControl<string>('0', {
-          nonNullable: true,
-        }),
-        nombre: new FormControl<string>('', {
-          nonNullable: true,
-          validators: [Validators.required, Validators.minLength(2)],
-        }),
-        tipo: new FormControl<'simple' | 'doble'>('simple', {
-          nonNullable: true,
-          validators: [Validators.required],
-        }),
-        alimentos: new FormControl<string | null>(null, {
-          nonNullable: true,
-          validators: [Validators.required],
-        }),
-        salsa: new FormControl<string | null>(null, {
-          nonNullable: true,
-          validators: [Validators.required],
-        }),
-      }),
-    });
-  }
-
   ngOnInit(): void {
+    this.fillSalsasList();
     this.form.controls.tortilla.controls.alimentos.valueChanges.subscribe(
-      selectedValue => {
-        if (selectedValue) {
-          this.alimentosList.forEach(item => {
-            if (item.value === selectedValue) {
-              item.selected = true;
-            }
-          });
-        }
+      changes => {
+        this.setSelected(changes);
       }
     );
-    // this.fillTortillaList();
-    this.fillAlimentoList();
-    this.fillSalsasList();
   }
 
-  // TODO: no pasar id ni precio, esto es la orden de delivery y esos campos deben ser manejados por el backend
-  onSubmit() {
-    if (this.form.valid) {
-      const formValue = this.form.value;
-      if (!formValue.tortilla) {
-        console.log('error al obtener el formulario');
-        return;
-      }
-      const tortilla: ITacoContent = {
-        id: formValue.tortilla.id!,
-        nombre: formValue.tortilla.nombre!,
-        precio: 2,
-      };
-      const alimentos = this.alimentosList
-        .filter(alimento => alimento.selected)
-        .map(alimento => {
-          return {
-            id: alimento.id.toString(),
-            nombre: alimento.label,
-            precio: 1,
-            tipoAlimento: 'alimentoTortilla',
-          } as IAlimento;
-        });
-      const taco: ITaco = {
-        tortilla: tortilla,
-        alimentos: alimentos,
-        precio: 100,
-      };
-      this.submitTaco.emit(taco);
-      this.form.reset();
+  setSelected(alimento: IAlimento | null): void {
+    if (!alimento) {
+      return;
+    }
+
+    const yaSeleccionado = this.alimentosSelecteds().find(
+      a => a.id === alimento.id
+    );
+
+    if (!yaSeleccionado) {
+      this.alimentosSelecteds.update(current => [...current, alimento]);
     }
   }
 
-  fillAlimentoList(): void {
-    this.tacosService.getAlimentos().subscribe(alimentos => {
-      if (!alimentos) {
-        console.log('error al obtener alimentos');
-        return;
-      }
-      alimentos.forEach(alimento => {
-        if (alimento.tipoAlimento === 'alimentoTortilla') {
-          this.alimentosList.push({
-            id: this.autoIncrementalIdTortillaList++,
-            label: alimento.nombre,
-            value: alimento.nombre,
-            selected: false,
-          });
-        }
-      });
-    });
+  unsetSelected(alimento: IAlimento): void {
+    this.alimentosSelecteds.update(current =>
+      current.filter(a => a.id !== alimento.id)
+    );
+  }
+
+  isAlimentoSelected(alimento: IAlimento): boolean {
+    return this.alimentosSelecteds().some(
+      selected => selected.id === alimento.id
+    );
+  }
+
+  onSubmit() {
+    console.log('enviado');
   }
 
   fillSalsasList(): void {
@@ -275,16 +268,6 @@ export class CrearTacoFormComponent implements OnInit {
   }
 
   limpiarAlimentosSelected() {
-    this.alimentosList.forEach(alimento => {
-      alimento.selected = false;
-    });
-  }
-
-  alimentosSeleccionados(): ISelectSimple[] | null {
-    const alimentos: ISelectSimple[] | null = [];
-    this.alimentosList.forEach(alimento => {
-      alimentos.push(alimento);
-    });
-    return alimentos.length > 0 ? alimentos : null;
+    this.alimentosSelecteds.set([]);
   }
 }

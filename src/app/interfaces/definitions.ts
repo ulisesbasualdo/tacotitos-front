@@ -19,6 +19,7 @@ export interface ISelectSimple {
   id: number;
   label: string;
   value: string;
+  precio?: number;
 }
 export interface ITaco {
   tortilla: ITacoContent;
