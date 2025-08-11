@@ -16,7 +16,7 @@ export interface ISelectMultiple extends ISelectSimple {
   selected: boolean;
 }
 export interface ISelectSimple {
-  id: number;
+  id: string;
   label: string;
   value: string;
   precio?: number;

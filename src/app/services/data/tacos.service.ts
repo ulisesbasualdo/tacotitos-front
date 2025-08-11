@@ -19,6 +19,16 @@ export class TacosService {
 
   getTortillas = httpResource<ITacoContent[]>(() => `${API_URL}/tortillas`);
 
+  getTortillasObservable(): Observable<ITacoContent[] | null> {
+    const url = environment.mockeable
+      ? 'json/get-tortillas.json'
+      : `${API_URL}/tortillas`;
+
+    return this.httpClient
+      .get<ITacoContent[]>(url)
+      .pipe(catchError(() => of(null)));
+  }
+
   getSalsas(): Observable<IAlimento[] | null> {
     const url = environment.mockeable
       ? 'json/get-salsas.json'

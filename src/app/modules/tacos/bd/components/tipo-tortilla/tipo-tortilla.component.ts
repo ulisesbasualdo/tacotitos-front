@@ -5,6 +5,7 @@ import {
   ITacoContent,
 } from '../../../../../interfaces/definitions';
 import { TacosService } from '../../../../../services/data/tacos.service';
+import { Utils } from '../../../../../../../../tacotitos-back/src/utils/utils';
 
 @Component({
   selector: 'app-tipo-tortilla',
@@ -41,45 +42,47 @@ import { TacosService } from '../../../../../services/data/tacos.service';
               " />
           </td>
         </tr>
-        @for (item of tacosService.getTortillas.value(); track item.id) {
-          <tr>
-            @if (!isEditing(item.id)) {
-              <td>{{ item.nombre }}</td>
-              <td>{{ item.precio }}</td>
-              <td>
-                <ui-btn (click)="putItemEditMode(item.id, true)" icon="pen" />
-                <ui-btn icon="save" />
-                <ui-btn icon="trash" (click)="deleteTortilla(item.id)" />
-              </td>
-            } @else {
-              <td>
-                <input
-                  #inputNombre
-                  type="text"
-                  placeholder="ingrese un nombre"
-                  [value]="item.nombre" />
-              </td>
-              <td>
-                <input
-                  #inputPrecio
-                  type="text"
-                  placeholder="ingrese un precio"
-                  class="text-right"
-                  [value]="item.precio" />
-              </td>
-              <td>
-                <ui-btn
-                  (click)="putItemEditMode(item.id, false)"
-                  icon="times" />
-                <ui-btn
-                  icon="save"
-                  (click)="
-                    saveEdit(item, inputNombre.value, inputPrecio.value)
-                  " />
-                <ui-btn icon="trash" (click)="deleteTortilla(item.id)" />
-              </td>
-            }
-          </tr>
+        @if (tacosService.getTortillas.hasValue()) {
+          @for (item of tiposTortilla(); track $index) {
+            <tr>
+              @if (!isEditing(item.id)) {
+                <td>{{ item.nombre }}</td>
+                <td>{{ item.precio }}</td>
+                <td>
+                  <ui-btn (click)="putItemEditMode(item.id, true)" icon="pen" />
+                  <ui-btn icon="save" />
+                  <ui-btn icon="trash" (click)="deleteTortilla(item.id)" />
+                </td>
+              } @else {
+                <td>
+                  <input
+                    #inputNombre
+                    type="text"
+                    placeholder="ingrese un nombre"
+                    [value]="item.nombre" />
+                </td>
+                <td>
+                  <input
+                    #inputPrecio
+                    type="text"
+                    placeholder="ingrese un precio"
+                    class="text-right"
+                    [value]="item.precio" />
+                </td>
+                <td>
+                  <ui-btn
+                    (click)="putItemEditMode(item.id, false)"
+                    icon="times" />
+                  <ui-btn
+                    icon="save"
+                    (click)="
+                      saveEdit(item, inputNombre.value, inputPrecio.value)
+                    " />
+                  <ui-btn icon="trash" (click)="deleteTortilla(item.id)" />
+                </td>
+              }
+            </tr>
+          }
         }
       </tbody>
     </table>
@@ -101,26 +104,29 @@ export class TipoTortillaComponent implements AfterViewInit {
     });
   }
 
-  // constructor(private readonly tacosService: TacosService) {}
-
   ngAfterViewInit(): void {
-    if (this.tacosService.getTortillas.hasValue()) {
-      for (const tortilla of this.tacosService.getTortillas.value()) {
-        this.tiposTortilla().push({
-          ...tortilla,
-          editMode: false,
+    this.tacosService.getTortillasObservable().subscribe({
+      next: tortillas => {
+        tortillas?.forEach(tortilla => {
+          this.tiposTortilla().push({
+            ...tortilla,
+            editMode: false,
+          });
         });
-      }
-    }
+      },
+    });
   }
 
   add(nombre: string, precio: string) {
-    const tortilla: Partial<ITacoContent> = {
+    const tortilla: ITacoContent = {
+      id: Utils.generarUUID(),
       nombre: nombre,
       precio: +precio,
     };
-    this.tacosService.addTortilla(tortilla).subscribe(tortilla => {
-      this.tiposTortilla().unshift({ ...tortilla, editMode: false });
+    this.tacosService.addTortilla(tortilla).subscribe({
+      next: tortillaCreada => {
+        this.tiposTortilla().unshift({ ...tortillaCreada, editMode: false });
+      },
     });
   }
 
