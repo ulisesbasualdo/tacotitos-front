@@ -5,7 +5,6 @@ import {
   ITacoContent,
 } from '../../../../../interfaces/definitions';
 import { TacosService } from '../../../../../services/data/tacos.service';
-import { Utils } from '../../../../../../../../tacotitos-back/src/utils/utils';
 
 @Component({
   selector: 'app-tipo-tortilla',
@@ -94,7 +93,8 @@ export class TipoTortillaComponent implements AfterViewInit {
 
   public tiposTortilla = signal<ITortillaEditable[]>([] as ITortillaEditable[]);
 
-  habilitarEditar(id: string): void {
+  habilitarEditar(id: number | undefined): void {
+    if (!id) return;
     this.tiposTortilla().forEach(item => {
       if (item.id === id) {
         item.editMode = true;
@@ -107,25 +107,27 @@ export class TipoTortillaComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.tacosService.getTortillasObservable().subscribe({
       next: tortillas => {
-        tortillas?.forEach(tortilla => {
-          this.tiposTortilla().push({
-            ...tortilla,
-            editMode: false,
-          });
-        });
+        if (!tortillas) return;
+        const tortillasWithEditMode = tortillas.map(tortilla => ({
+          ...tortilla,
+          editMode: false,
+        }));
+        this.tiposTortilla.set(tortillasWithEditMode);
       },
     });
   }
 
-  add(nombre: string, precio: string) {
-    const tortilla: ITacoContent = {
-      id: Utils.generarUUID(),
+  add(nombre: string, precio: string): void {
+    const tortilla: Partial<ITacoContent> = {
       nombre: nombre,
       precio: +precio,
     };
     this.tacosService.addTortilla(tortilla).subscribe({
       next: tortillaCreada => {
-        this.tiposTortilla().unshift({ ...tortillaCreada, editMode: false });
+        this.tiposTortilla.update(current => [
+          { ...tortillaCreada, editMode: false },
+          ...current,
+        ]);
       },
     });
   }
@@ -145,25 +147,31 @@ export class TipoTortillaComponent implements AfterViewInit {
     });
   }
 
-  deleteTortilla(id: string): void {
+  deleteTortilla(id: number | undefined): void {
+    if (!id) return;
     console.log('hizo clic en delete');
     this.tacosService.deleteTortilla(id).subscribe({
       next: () => {
         this.tiposTortilla.set(this.tiposTortilla().filter(t => t.id !== id));
       },
-      error: err => {
+      error: (err: unknown) => {
         console.error('Error al eliminar la tortilla:', err);
       },
     });
   }
 
-  isEditing(id: string): boolean {
+  isEditing(id: number | undefined): boolean {
+    if (!id) return false;
     return this.tiposTortilla().some(item => item.id === id && item.editMode);
   }
 
-  putItemEditMode(id: string, editMode: boolean): void {
-    this.tiposTortilla().forEach(item => {
-      item.editMode = item.id === id && editMode;
-    });
+  putItemEditMode(id: number | undefined, editMode: boolean): void {
+    if (!id) return;
+    this.tiposTortilla.update(items =>
+      items.map(item => ({
+        ...item,
+        editMode: item.id === id && editMode,
+      }))
+    );
   }
 }

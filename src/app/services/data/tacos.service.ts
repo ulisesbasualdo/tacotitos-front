@@ -1,6 +1,6 @@
 import { HttpClient, httpResource } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { ITaco, IAlimento, ITacoContent } from '../../interfaces/definitions';
+import { Injectable, inject } from '@angular/core';
+import { ITaco, ITacoContent } from '../../interfaces/definitions';
 import { catchError, Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 
@@ -10,7 +10,7 @@ export const API_URL = 'http://localhost:3000/tacos';
   providedIn: 'root',
 })
 export class TacosService {
-  constructor(private readonly httpClient: HttpClient) {}
+  private readonly httpClient = inject(HttpClient);
 
   getTacos(): Observable<ITaco[]> {
     const url = environment.mockeable ? 'json/get-tacos.json' : API_URL;
@@ -29,51 +29,95 @@ export class TacosService {
       .pipe(catchError(() => of(null)));
   }
 
-  getSalsas(): Observable<IAlimento[] | null> {
+  // Sauces
+  getSauces(): Observable<ITacoContent[] | null> {
     const url = environment.mockeable
       ? 'json/get-salsas.json'
-      : `${API_URL}/salsas`;
+      : `${API_URL}/sauces`;
     return this.httpClient
-      .get<IAlimento[]>(url)
+      .get<ITacoContent[]>(url)
       .pipe(catchError(() => of(null)));
   }
-  getAlimentos(): Observable<IAlimento[] | null> {
+
+  addSauce(sauce: Partial<ITacoContent>): Observable<ITacoContent> {
+    if (environment.mockeable) {
+      const sauceCompleta: ITacoContent = {
+        id: 70,
+        nombre: sauce.nombre ?? '-',
+        precio: sauce.precio ?? 0,
+      };
+      return of(sauceCompleta);
+    } else {
+      return this.httpClient.post<ITacoContent>(`${API_URL}/sauces`, sauce);
+    }
+  }
+
+  editSauce(sauce: ITacoContent): Observable<ITacoContent> {
+    if (environment.mockeable) {
+      return of(sauce);
+    } else {
+      return this.httpClient.put<ITacoContent>(
+        `${API_URL}/sauces/${sauce.id}`,
+        sauce
+      );
+    }
+  }
+
+  deleteSauce(id: number): Observable<void> {
+    if (environment.mockeable) {
+      return of();
+    } else {
+      return this.httpClient.delete<void>(`${API_URL}/sauces/${id}`);
+    }
+  }
+
+  // Fillings
+  getFillings(): Observable<ITacoContent[] | null> {
     const url = environment.mockeable
       ? 'json/get-alimentos.json'
-      : `${API_URL}/alimentos`;
+      : `${API_URL}/fillings`;
     return this.httpClient
-      .get<IAlimento[]>(url)
+      .get<ITacoContent[]>(url)
       .pipe(catchError(() => of(null)));
   }
 
-  createTaco(taco: ITaco): Observable<ITaco> {
-    return this.httpClient.post<ITaco>(API_URL, taco);
-  }
-  editSalsa(salsa: IAlimento): Observable<IAlimento> {
+  addFilling(filling: Partial<ITacoContent>): Observable<ITacoContent> {
     if (environment.mockeable) {
-      return of(salsa);
+      const fillingCompleto: ITacoContent = {
+        id: 70,
+        nombre: filling.nombre ?? '-',
+        precio: filling.precio ?? 0,
+      };
+      return of(fillingCompleto);
     } else {
-      return this.httpClient.put<IAlimento>(
-        `${API_URL}/salsas/${salsa.id}`,
-        salsa
-      );
+      return this.httpClient.post<ITacoContent>(`${API_URL}/fillings`, filling);
     }
   }
-  editAlimento(alimento: IAlimento): Observable<IAlimento> {
+
+  editFilling(filling: ITacoContent): Observable<ITacoContent> {
     if (environment.mockeable) {
-      return of(alimento);
+      return of(filling);
     } else {
-      return this.httpClient.put<IAlimento>(
-        `${API_URL}/alimentos/${alimento.id}`,
-        alimento
+      return this.httpClient.put<ITacoContent>(
+        `${API_URL}/fillings/${filling.id}`,
+        filling
       );
     }
   }
 
+  deleteFilling(id: number): Observable<void> {
+    if (environment.mockeable) {
+      return of();
+    } else {
+      return this.httpClient.delete<void>(`${API_URL}/fillings/${id}`);
+    }
+  }
+
+  // Tortillas
   addTortilla(tortilla: Partial<ITacoContent>): Observable<ITacoContent> {
     if (environment.mockeable) {
       const tortillaCompleta: ITacoContent = {
-        id: '70',
+        id: 70,
         nombre: tortilla.nombre ?? '-',
         precio: tortilla.precio ?? 0,
       };
@@ -97,7 +141,7 @@ export class TacosService {
     }
   }
 
-  deleteTortilla(id: string): Observable<void> {
+  deleteTortilla(id: number): Observable<void> {
     if (environment.mockeable) {
       return of();
     } else {
@@ -105,47 +149,8 @@ export class TacosService {
     }
   }
 
-  addAlimento(alimento: Partial<IAlimento>): Observable<IAlimento> {
-    if (environment.mockeable) {
-      const alimentoCompleto: IAlimento = {
-        id: '70',
-        nombre: alimento.nombre ?? '-',
-        precio: alimento.precio ?? 0,
-        tipoAlimento: 'alimentoTortilla',
-      };
-      return of(alimentoCompleto);
-    } else {
-      return this.httpClient.post<IAlimento>(`${API_URL}/alimentos`, alimento);
-    }
-  }
-
-  deleteAlimento(id: string): Observable<void> {
-    if (environment.mockeable) {
-      return of();
-    } else {
-      return this.httpClient.delete<void>(`${API_URL}/alimentos/${id}`);
-    }
-  }
-
-  addSalsa(salsa: Partial<IAlimento>): Observable<IAlimento> {
-    if (environment.mockeable) {
-      const salsaCompleta: IAlimento = {
-        id: '70',
-        nombre: salsa.nombre ?? '-',
-        precio: salsa.precio ?? 0,
-        tipoAlimento: 'salsa',
-      };
-      return of(salsaCompleta);
-    } else {
-      return this.httpClient.post<IAlimento>(`${API_URL}/salsas`, salsa);
-    }
-  }
-
-  deleteSalsa(id: string): Observable<void> {
-    if (environment.mockeable) {
-      return of();
-    } else {
-      return this.httpClient.delete<void>(`${API_URL}/salsas/${id}`);
-    }
+  // Tacos
+  createTaco(taco: ITaco): Observable<ITaco> {
+    return this.httpClient.post<ITaco>(API_URL, taco);
   }
 }

@@ -17,7 +17,6 @@ import { BtnComponent } from '../../../ui/atoms/btn/btn.component';
 import {
   ITaco,
   ITacoContent,
-  IAlimento,
   ISelectSimple,
 } from '../../../interfaces/definitions';
 import { API_URL, TacosService } from '../../../services/data/tacos.service';
@@ -26,11 +25,11 @@ import { httpResource } from '@angular/common/http';
 
 interface ITacoForm {
   tortilla: FormGroup<{
-    id: FormControl<string>;
+    id: FormControl<number>;
     nombre: FormControl<ITacoContent | null>;
-    tipo: FormControl<'simple' | 'doble'>;
-    alimentos: FormControl<IAlimento | null>;
-    salsa: FormControl<IAlimento | null>;
+    tipo: FormControl<'single' | 'double'>;
+    fillings: FormControl<ITacoContent | null>;
+    sauce: FormControl<ITacoContent | null>;
   }>;
 }
 
@@ -48,7 +47,7 @@ interface ITacoForm {
                 class="form-check-input"
                 type="radio"
                 formControlName="tipo"
-                value="simple" />
+                value="single" />
               Tortilla simple (precio base)
             </label>
             <label class="form-check-label">
@@ -56,41 +55,39 @@ interface ITacoForm {
                 class="form-check-input"
                 type="radio"
                 formControlName="tipo"
-                value="doble" />
+                value="double" />
               Tortilla doble (x2 precio tortilla)
             </label>
           </div>
 
-          <!-- ALIMENTOS -->
+          <!-- FILLINGS -->
 
-          <div class="container-alimentos mb-3">
-            <label class="form-label " for="tortillaAlimentos"
-              >Alimentos:</label
-            >
+          <div class="container-fillings mb-3">
+            <label class="form-label " for="tortillaFillings">Fillings:</label>
             <select
               class="form-control mt-2"
-              formControlName="alimentos"
-              name="tortillaAlimentos"
-              id="tortillaAlimentos">
-              @for (alimento of alimentosResource.value(); track $index) {
-                <option [ngValue]="alimento" #optionAlimento>
-                  @if (isAlimentoSelected(alimento)) {
-                    {{ alimento.nombre }} ✓
+              formControlName="fillings"
+              name="tortillaFillings"
+              id="tortillaFillings">
+              @for (filling of fillingsResource.value(); track $index) {
+                <option [ngValue]="filling" #optionFilling>
+                  @if (isFillingSelected(filling)) {
+                    {{ filling.nombre }} ✓
                   } @else {
-                    {{ alimento.nombre }}
+                    {{ filling.nombre }}
                   }
                 </option>
               }
             </select>
           </div>
           <div>
-            Alimentos seleccionados:
+            Fillings seleccionados:
             <ul class="d-flex flex-row">
-              @for (alimento of alimentosSelecteds(); track $index) {
+              @for (filling of fillingsSelecteds(); track $index) {
                 <li class="d-flex align-items-baseline">
-                  {{ alimento.nombre
+                  {{ filling.nombre
                   }}<ui-btn
-                    (click)="unsetSelected(alimento)"
+                    (click)="unsetSelected(filling)"
                     icon="times"
                     noBg />
                 </li>
@@ -124,16 +121,16 @@ interface ITacoForm {
               </select>
             }
           </div>
-          <div class="container-salsa">
-            <label class="form-label" for="salsa">Salsa:</label>
+          <div class="container-sauce">
+            <label class="form-label" for="sauce">Sauce:</label>
             <select
               class="form-control"
-              formControlName="salsa"
-              name="salsa"
-              id="salsa">
-              @for (salsa of salsasResource.value(); track salsa.id) {
-                <option [ngValue]="salsa">
-                  {{ salsa.nombre }}
+              formControlName="sauce"
+              name="sauce"
+              id="sauce">
+              @for (sauce of saucesResource.value(); track sauce.id) {
+                <option [ngValue]="sauce">
+                  {{ sauce.nombre }}
                 </option>
               }
             </select>
@@ -141,12 +138,12 @@ interface ITacoForm {
         </div>
       </div>
       <div class="btn-group mt-4">
-        <!-- Sección Salsa -->
+        <!-- Sección Sauce -->
         <ui-btn
           [color]="'bgGrayTxtBlue'"
           [text]="'Restablecer'"
           [disabled]="form.pristine"
-          (click)="limpiarAlimentosSelected(); form.reset()"></ui-btn>
+          (click)="limpiarFillingsSelected(); form.reset()"></ui-btn>
         <ui-btn
           [color]="'green'"
           [text]="'Crear Pedido'"
@@ -165,22 +162,22 @@ export class CrearTacoFormComponent implements OnInit {
 
   form: FormGroup<ITacoForm> = this.formBuilder.group<ITacoForm>({
     tortilla: this.formBuilder.group({
-      id: new FormControl<string>('0', {
+      id: new FormControl<number>(0, {
         nonNullable: true,
       }),
       nombre: new FormControl<ITacoContent | null>(null, {
         nonNullable: false,
         validators: [Validators.required],
       }),
-      tipo: new FormControl<'simple' | 'doble'>('simple', {
+      tipo: new FormControl<'single' | 'double'>('single', {
         nonNullable: true,
         validators: [Validators.required],
       }),
-      alimentos: new FormControl<IAlimento | null>(null, {
+      fillings: new FormControl<ITacoContent | null>(null, {
         nonNullable: true,
         validators: [Validators.required],
       }),
-      salsa: new FormControl<IAlimento | null>(null, {
+      sauce: new FormControl<ITacoContent | null>(null, {
         nonNullable: true,
         validators: [Validators.required],
       }),
@@ -196,34 +193,34 @@ export class CrearTacoFormComponent implements OnInit {
     { initialValue: this.form.controls.tortilla.controls.tipo.value }
   );
 
-  private readonly salsaSeleccionada = toSignal(
-    this.form.controls.tortilla.controls.salsa.valueChanges,
-    { initialValue: this.form.controls.tortilla.controls.salsa.value }
+  private readonly sauceSeleccionada = toSignal(
+    this.form.controls.tortilla.controls.sauce.valueChanges,
+    { initialValue: this.form.controls.tortilla.controls.sauce.value }
   );
   tortillaPrice = computed(() => this._tortillaSeleccionada()?.precio ?? 0);
-  alimentosPrice = computed(() =>
-    this.alimentosSelecteds().reduce(
-      (total, alimento) => total + alimento.precio,
+  fillingsPrice = computed(() =>
+    this.fillingsSelecteds().reduce(
+      (total, filling) => total + filling.precio,
       0
     )
   );
-  protected readonly salsaPrice = computed(
-    () => this.salsaSeleccionada()?.precio ?? 0
+  protected readonly saucePrice = computed(
+    () => this.sauceSeleccionada()?.precio ?? 0
   );
   protected readonly totalPrice = computed(
-    () => this.tortillaTotalPrice() + this.alimentosPrice() + this.salsaPrice()
+    () => this.tortillaTotalPrice() + this.fillingsPrice() + this.saucePrice()
   );
-  alimentosSelecteds = signal<IAlimento[]>([]);
-  alimentosResource = httpResource<IAlimento[]>(() => `${API_URL}/alimentos`);
-  protected readonly salsasResource = httpResource<IAlimento[]>(
-    () => `${API_URL}/salsas`
+  fillingsSelecteds = signal<ITacoContent[]>([]);
+  fillingsResource = httpResource<ITacoContent[]>(() => `${API_URL}/fillings`);
+  protected readonly saucesResource = httpResource<ITacoContent[]>(
+    () => `${API_URL}/sauces`
   );
   protected readonly baseTortillaPrice = computed(
     () => this._tortillaSeleccionada()?.precio ?? 0
   );
 
   protected readonly tipoMultiplicador = computed(() =>
-    this.tipoTortillaSeleccionado() === 'doble' ? 2 : 1
+    this.tipoTortillaSeleccionado() === 'double' ? 2 : 1
   );
 
   protected readonly tortillaTotalPrice = computed(
@@ -237,44 +234,44 @@ export class CrearTacoFormComponent implements OnInit {
   autoIncrementalIdSalsasList = 0;
 
   ngOnInit(): void {
-    this.form.controls.tortilla.controls.alimentos.valueChanges.subscribe(
+    this.form.controls.tortilla.controls.fillings.valueChanges.subscribe(
       changes => {
         this.setSelected(changes);
       }
     );
   }
 
-  setSelected(alimento: IAlimento | null): void {
-    if (!alimento) {
+  setSelected(filling: ITacoContent | null): void {
+    if (!filling) {
       return;
     }
 
-    const yaSeleccionado = this.alimentosSelecteds().find(
-      a => a.id === alimento.id
+    const yaSeleccionado = this.fillingsSelecteds().find(
+      f => f.id === filling.id
     );
 
     if (!yaSeleccionado) {
-      this.alimentosSelecteds.update(current => [...current, alimento]);
+      this.fillingsSelecteds.update(current => [...current, filling]);
     }
   }
 
-  unsetSelected(alimento: IAlimento): void {
-    this.alimentosSelecteds.update(current =>
-      current.filter(a => a.id !== alimento.id)
+  unsetSelected(filling: ITacoContent): void {
+    this.fillingsSelecteds.update(current =>
+      current.filter(f => f.id !== filling.id)
     );
   }
 
-  isAlimentoSelected(alimento: IAlimento): boolean {
-    return this.alimentosSelecteds().some(
-      selected => selected.id === alimento.id
+  isFillingSelected(filling: ITacoContent): boolean {
+    return this.fillingsSelecteds().some(
+      selected => selected.id === filling.id
     );
   }
 
-  onSubmit() {
+  onSubmit(): void {
     console.log('enviado');
   }
 
-  limpiarAlimentosSelected() {
-    this.alimentosSelecteds.set([]);
+  limpiarFillingsSelected(): void {
+    this.fillingsSelecteds.set([]);
   }
 }

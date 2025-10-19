@@ -25,12 +25,12 @@ import { DecimalPipe } from '@angular/common';
             @if (expensiveTacoResource.hasValue()) {
               <td>
                 {{
-                  (expensiveTacoResource.value().valor | number: '1.2-2') || '-'
+                  (expensiveTacoResource.value().value | number: '1.2-2') || '-'
                 }}
               </td>
-              <td>{{ expensiveTacoResource.value().tipoTortilla || '-' }}</td>
-              <td>{{ expensiveTacoResource.value().salsa || '-' }}</td>
-              <td>{{ expensiveTacoResource.value().alimentos || '-' }}</td>
+              <td>{{ expensiveTacoResource.value().tortillaType || '-' }}</td>
+              <td>{{ expensiveTacoResource.value().sauce || '-' }}</td>
+              <td>{{ expensiveTacoResource.value().fillings || '-' }}</td>
             }
             @if (
               expensiveTacoResource.error() &&
@@ -48,12 +48,12 @@ import { DecimalPipe } from '@angular/common';
             @if (cheapestTacoResource.hasValue()) {
               <td>
                 {{
-                  (cheapestTacoResource.value().valor | number: '1.2-2') || '-'
+                  (cheapestTacoResource.value().value | number: '1.2-2') || '-'
                 }}
               </td>
-              <td>{{ cheapestTacoResource.value().tipoTortilla || '-' }}</td>
-              <td>{{ cheapestTacoResource.value().salsa || '-' }}</td>
-              <td>{{ cheapestTacoResource.value().alimentos || '-' }}</td>
+              <td>{{ cheapestTacoResource.value().tortillaType || '-' }}</td>
+              <td>{{ cheapestTacoResource.value().sauce || '-' }}</td>
+              <td>{{ cheapestTacoResource.value().fillings || '-' }}</td>
             }
             @if (
               cheapestTacoResource.error() && !cheapestTacoResource.isLoading()
@@ -70,7 +70,7 @@ import { DecimalPipe } from '@angular/common';
     Valor promedio de un taco:
     {{
       averageTacoResource.hasValue()
-        ? (averageTacoResource.value() | number: '1.2-2')
+        ? (averageTacoResource.value().averagePrice | number: '1.2-2')
         : 'sin datos'
     }}
   `,
@@ -92,7 +92,7 @@ export class EstadisticasComponent {
     () => `${API_URL}/stats/most-expensive`
   );
 
-  averageTacoResource = httpResource<number>(
+  averageTacoResource = httpResource<{ averagePrice: number }>(
     () => `${API_URL}/stats/average-price`
   );
 }

@@ -1,14 +1,26 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { BtnComponent } from '../../../../../ui/atoms/btn/btn.component';
 import {
-  IAlimento,
-  IAlimentoEditable,
+  IFillingEditable,
+  ITacoContent,
 } from '../../../../../interfaces/definitions';
 import { TacosService } from '../../../../../services/data/tacos.service';
 
+interface IFillingForm {
+  id: FormControl<number>;
+  nombre: FormControl<string>;
+  precio: FormControl<number>;
+}
+
 @Component({
-  selector: 'app-alimentos',
-  imports: [BtnComponent],
+  selector: 'app-fillings',
+  imports: [BtnComponent, ReactiveFormsModule],
   template: `
     <table>
       <thead>
@@ -46,7 +58,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
               " />
           </td>
         </tr>
-        @for (item of alimentos(); track item.id) {
+        @for (item of fillings(); track item.id) {
           <tr>
             @if (!item.editMode) {
               <td>{{ item.nombre }}</td>
@@ -54,7 +66,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
               <td>
                 <ui-btn (click)="habilitarEditar(item.id)" icon="pen" />
                 <ui-btn icon="save" />
-                <ui-btn icon="trash" (click)="deleteAlimento(item.id)" />
+                <ui-btn icon="trash" (click)="deleteFilling(item.id)" />
               </td>
             } @else {
               <td>
@@ -79,7 +91,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
                   (click)="
                     saveEdit(item, inputNombre.value, inputPrecio.value)
                   " />
-                <ui-btn icon="trash" (click)="deleteAlimento(item.id)" />
+                <ui-btn icon="trash" (click)="deleteFilling(item.id)" />
               </td>
             }
           </tr>
@@ -90,61 +102,82 @@ import { TacosService } from '../../../../../services/data/tacos.service';
   styleUrl: '../bd-styles.scss',
 })
 export class AlimentosComponent implements OnInit {
-  protected alimentos = signal<IAlimentoEditable[]>([]);
+  protected fillings = signal<IFillingEditable[]>([]);
 
-  habilitarEditar(id: string): void {
-    this.alimentos.update(items =>
+  private fb = inject(FormBuilder);
+
+  form: FormGroup<IFillingForm> = this.fb.group<IFillingForm>(
+    {} as IFillingForm
+  );
+
+  habilitarEditar(id: number | undefined): void {
+    if (!id) return;
+    this.fillings.update(items =>
       items.map(item => ({
         ...item,
         editMode: item.id === id,
       }))
     );
   }
+
   constructor(private readonly tacosService: TacosService) {}
+
   ngOnInit(): void {
     this.tacosService
-      .getAlimentos()
-      .subscribe((alimentos: IAlimento[] | null) => {
-        if (!alimentos) {
-          console.log('error al obtener las salsas');
+      .getFillings()
+      .subscribe((fillings: ITacoContent[] | null) => {
+        if (!fillings) {
+          console.log('error al obtener los fillings');
           return;
         }
-        this.alimentos.set(
-          alimentos.map(alimento => ({
-            ...alimento,
+        this.fillings.set(
+          fillings.map(filling => ({
+            ...filling,
             editMode: false,
           }))
         );
+        this.form = this.fb.group<IFillingForm>({
+          id: new FormControl<number>(0, {
+            nonNullable: true,
+          }),
+          nombre: new FormControl<string>('', {
+            nonNullable: true,
+          }),
+          precio: new FormControl<number>(0, {
+            nonNullable: true,
+          }),
+        });
       });
   }
-  saveEdit(item: IAlimento, nuevoNombre: string, nuevoPrecio: string): void {
+
+  saveEdit(item: ITacoContent, nuevoNombre: string, nuevoPrecio: string): void {
     item.nombre = nuevoNombre;
     item.precio = +nuevoPrecio;
-    this.tacosService.editAlimento(item).subscribe((alimento: IAlimento) => {
-      this.alimentos.update(items =>
-        items.map(a => {
-          if (a.id === alimento.id) {
-            return { ...a, ...alimento, editMode: false };
+    this.tacosService.editFilling(item).subscribe((filling: ITacoContent) => {
+      this.fillings.update(items =>
+        items.map(f => {
+          if (f.id === filling.id) {
+            return { ...f, ...filling, editMode: false };
           }
-          return a;
+          return f;
         })
       );
     });
   }
+
   add(
     nombre: string,
     precio: string,
     inputNombre: HTMLInputElement,
     inputPrecio: HTMLInputElement
-  ) {
-    const alimento: Partial<IAlimento> = {
+  ): void {
+    const filling: Partial<ITacoContent> = {
       nombre: nombre,
       precio: +precio,
-      tipoAlimento: 'alimentoTortilla',
     };
-    this.tacosService.addAlimento(alimento).subscribe(alimento => {
-      this.alimentos.update(items => [
-        { ...alimento, editMode: false },
+    this.tacosService.addFilling(filling).subscribe((filling: ITacoContent) => {
+      this.fillings.update(items => [
+        { ...filling, editMode: false },
         ...items,
       ]);
       inputNombre.value = '';
@@ -152,14 +185,15 @@ export class AlimentosComponent implements OnInit {
     });
   }
 
-  deleteAlimento(id: string): void {
+  deleteFilling(id: number | undefined): void {
+    if (!id) return;
     console.log('hizo clic en delete');
-    this.tacosService.deleteAlimento(id).subscribe({
+    this.tacosService.deleteFilling(id).subscribe({
       next: () => {
-        this.alimentos.update(items => items.filter(a => a.id !== id));
+        this.fillings.update(items => items.filter(f => f.id !== id));
       },
-      error: err => {
-        console.error('Error al eliminar el alimento:', err);
+      error: (err: unknown) => {
+        console.error('Error al eliminar el filling:', err);
       },
     });
   }

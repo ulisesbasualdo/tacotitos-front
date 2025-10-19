@@ -18,14 +18,14 @@ import { SalsasComponent } from './components/salsas/salsas.component';
         <app-tipo-tortilla />
       </div>
     </ui-card>
-    <ui-card titleText="Alimentos" width100 hasMarginTop>
+    <ui-card titleText="Fillings" width100 hasMarginTop>
       <div cardBody>
-        <app-alimentos />
+        <app-fillings />
       </div>
     </ui-card>
-    <ui-card titleText="Salsas" width100 hasMarginTop>
+    <ui-card titleText="Sauces" width100 hasMarginTop>
       <div cardBody>
-        <app-salsas />
+        <app-sauces />
       </div>
     </ui-card>
   `,

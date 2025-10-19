@@ -1,6 +1,6 @@
 import { AbstractControl } from '@angular/forms';
 
-export type TTipoAlimento = 'alimentoTortilla' | 'salsa';
+export type TTortillaType = 'single' | 'double';
 
 export type FormControlsOf<T> = {
   [K in keyof T]: AbstractControl<T[K]>;
@@ -9,38 +9,43 @@ export type FormControlsOf<T> = {
 export interface ITortillaEditable extends ITacoContent {
   editMode: boolean;
 }
-export interface IAlimentoEditable extends IAlimento {
+
+export interface IFillingEditable extends ITacoContent {
   editMode: boolean;
 }
+
+export interface ISauceEditable extends ITacoContent {
+  editMode: boolean;
+}
+
 export interface ISelectMultiple extends ISelectSimple {
   selected: boolean;
 }
+
 export interface ISelectSimple {
-  id: string;
+  id: number;
   label: string;
   value: string;
   precio?: number;
 }
+
 export interface ITaco {
+  id?: number;
   tortilla: ITacoContent;
-  salsa?: IAlimento;
-  alimentos: IAlimento[];
+  sauce?: ITacoContent;
+  fillings: ITacoContent[];
   precio: number;
 }
 
 export interface ITacoStats {
-  valor: number | null;
-  tipoTortilla: string | null;
-  salsa: string | null;
-  alimentos: string[] | null;
+  value: number | null;
+  tortillaType: string | null;
+  sauce: string | null;
+  fillings: string[] | null;
 }
 
 export interface ITacoContent {
-  id: string;
+  id?: number;
   nombre: string;
   precio: number;
-}
-
-export interface IAlimento extends ITacoContent {
-  tipoAlimento: TTipoAlimento;
 }

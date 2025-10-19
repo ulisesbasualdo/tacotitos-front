@@ -1,13 +1,13 @@
 import { Component, OnInit, signal } from '@angular/core';
 import {
-  IAlimento,
-  IAlimentoEditable,
+  ISauceEditable,
+  ITacoContent,
 } from '../../../../../interfaces/definitions';
 import { BtnComponent } from '../../../../../ui/atoms/btn/btn.component';
 import { TacosService } from '../../../../../services/data/tacos.service';
 
 @Component({
-  selector: 'app-salsas',
+  selector: 'app-sauces',
   imports: [BtnComponent],
   template: `
     <table>
@@ -46,7 +46,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
               " />
           </td>
         </tr>
-        @for (item of salsas(); track item.id) {
+        @for (item of sauces(); track item.id) {
           <tr>
             @if (!item.editMode) {
               <td>{{ item.nombre }}</td>
@@ -54,7 +54,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
               <td>
                 <ui-btn (click)="habilitarEditar(item.id)" icon="pen" />
                 <ui-btn icon="save" />
-                <ui-btn icon="trash" (click)="deleteSalsa(item.id)" />
+                <ui-btn icon="trash" (click)="deleteSauce(item.id)" />
               </td>
             } @else {
               <td>
@@ -79,7 +79,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
                   (click)="
                     saveEdit(item, inputNombre.value, inputPrecio.value)
                   " />
-                <ui-btn icon="trash" (click)="deleteSalsa(item.id)" />
+                <ui-btn icon="trash" (click)="deleteSauce(item.id)" />
               </td>
             }
           </tr>
@@ -90,10 +90,11 @@ import { TacosService } from '../../../../../services/data/tacos.service';
   styleUrl: '../bd-styles.scss',
 })
 export class SalsasComponent implements OnInit {
-  protected salsas = signal<IAlimentoEditable[]>([]);
+  protected sauces = signal<ISauceEditable[]>([]);
 
-  habilitarEditar(id: string): void {
-    this.salsas.update(items =>
+  habilitarEditar(id: number | undefined): void {
+    if (!id) return;
+    this.sauces.update(items =>
       items.map(item => ({
         ...item,
         editMode: item.id === id,
@@ -102,29 +103,30 @@ export class SalsasComponent implements OnInit {
   }
 
   constructor(private readonly tacosService: TacosService) {}
+
   ngOnInit(): void {
-    this.tacosService.getSalsas().subscribe((salsas: IAlimento[] | null) => {
-      if (!salsas) {
-        console.log('error al obtener las salsas');
+    this.tacosService.getSauces().subscribe((sauces: ITacoContent[] | null) => {
+      if (!sauces) {
+        console.log('error al obtener las sauces');
         return;
       }
-      this.salsas.set(
-        salsas.map(salsa => ({
-          ...salsa,
+      this.sauces.set(
+        sauces.map(sauce => ({
+          ...sauce,
           editMode: false,
         }))
       );
     });
   }
 
-  saveEdit(item: IAlimento, nuevoNombre: string, nuevoPrecio: string): void {
+  saveEdit(item: ITacoContent, nuevoNombre: string, nuevoPrecio: string): void {
     item.nombre = nuevoNombre;
     item.precio = +nuevoPrecio;
-    this.tacosService.editSalsa(item).subscribe((salsa: IAlimento) => {
-      this.salsas.update(items =>
+    this.tacosService.editSauce(item).subscribe((sauce: ITacoContent) => {
+      this.sauces.update(items =>
         items.map(s => {
-          if (s.id === salsa.id) {
-            return { ...s, ...salsa, editMode: false };
+          if (s.id === sauce.id) {
+            return { ...s, ...sauce, editMode: false };
           }
           return s;
         })
@@ -137,27 +139,27 @@ export class SalsasComponent implements OnInit {
     precio: string,
     inputNombre: HTMLInputElement,
     inputPrecio: HTMLInputElement
-  ) {
-    const salsa: Partial<IAlimento> = {
+  ): void {
+    const sauce: Partial<ITacoContent> = {
       nombre: nombre,
       precio: +precio,
-      tipoAlimento: 'salsa',
     };
-    this.tacosService.addSalsa(salsa).subscribe(salsa => {
-      this.salsas.update(items => [{ ...salsa, editMode: false }, ...items]);
+    this.tacosService.addSauce(sauce).subscribe((sauce: ITacoContent) => {
+      this.sauces.update(items => [{ ...sauce, editMode: false }, ...items]);
       inputNombre.value = '';
       inputPrecio.value = '';
     });
   }
 
-  deleteSalsa(id: string): void {
+  deleteSauce(id: number | undefined): void {
+    if (!id) return;
     console.log('hizo clic en delete');
-    this.tacosService.deleteSalsa(id).subscribe({
+    this.tacosService.deleteSauce(id).subscribe({
       next: () => {
-        this.salsas.update(items => items.filter(s => s.id !== id));
+        this.sauces.update(items => items.filter(s => s.id !== id));
       },
-      error: err => {
-        console.error('Error al eliminar la salsa:', err);
+      error: (err: unknown) => {
+        console.error('Error al eliminar la sauce:', err);
       },
     });
   }
