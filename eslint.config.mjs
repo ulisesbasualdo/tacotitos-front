@@ -41,7 +41,7 @@ export default defineConfig([
           style: 'kebab-case',
         },
       ],
-
+      '@angular-eslint/component-class-suffix': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-var-requires': 'off',
     },

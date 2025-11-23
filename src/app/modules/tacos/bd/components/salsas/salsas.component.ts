@@ -49,8 +49,8 @@ import { TacosService } from '../../../../../services/data/tacos.service';
         @for (item of sauces(); track item.id) {
           <tr>
             @if (!item.editMode) {
-              <td>{{ item.nombre }}</td>
-              <td>{{ item.precio }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.price }}</td>
               <td>
                 <ui-btn (click)="habilitarEditar(item.id)" icon="pen" />
                 <ui-btn icon="save" />
@@ -62,7 +62,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
                   #inputNombre
                   type="text"
                   placeholder="ingrese un nombre"
-                  [value]="item.nombre" />
+                  [value]="item.name" />
               </td>
               <td>
                 <input
@@ -70,7 +70,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
                   type="text"
                   placeholder="ingrese un precio"
                   class="text-right"
-                  [value]="item.precio" />
+                  [value]="item.price" />
               </td>
               <td>
                 <ui-btn (click)="item.editMode = false" icon="times" />
@@ -120,8 +120,8 @@ export class SalsasComponent implements OnInit {
   }
 
   saveEdit(item: ITacoContent, nuevoNombre: string, nuevoPrecio: string): void {
-    item.nombre = nuevoNombre;
-    item.precio = +nuevoPrecio;
+    item.name = nuevoNombre;
+    item.price = +nuevoPrecio;
     this.tacosService.editSauce(item).subscribe((sauce: ITacoContent) => {
       this.sauces.update(items =>
         items.map(s => {
@@ -141,8 +141,8 @@ export class SalsasComponent implements OnInit {
     inputPrecio: HTMLInputElement
   ): void {
     const sauce: Partial<ITacoContent> = {
-      nombre: nombre,
-      precio: +precio,
+      name: nombre,
+      price: +precio,
     };
     this.tacosService.addSauce(sauce).subscribe((sauce: ITacoContent) => {
       this.sauces.update(items => [{ ...sauce, editMode: false }, ...items]);

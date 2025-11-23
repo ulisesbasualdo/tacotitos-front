@@ -46,6 +46,6 @@ export interface ITacoStats {
 
 export interface ITacoContent {
   id?: number;
-  nombre: string;
-  precio: number;
+  name: string;
+  price: number;
 }

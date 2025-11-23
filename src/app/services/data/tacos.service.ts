@@ -43,8 +43,8 @@ export class TacosService {
     if (environment.mockeable) {
       const sauceCompleta: ITacoContent = {
         id: 70,
-        nombre: sauce.nombre ?? '-',
-        precio: sauce.precio ?? 0,
+        name: sauce.name ?? '-',
+        price: sauce.price ?? 0,
       };
       return of(sauceCompleta);
     } else {
@@ -85,8 +85,8 @@ export class TacosService {
     if (environment.mockeable) {
       const fillingCompleto: ITacoContent = {
         id: 70,
-        nombre: filling.nombre ?? '-',
-        precio: filling.precio ?? 0,
+        name: filling.name ?? '-',
+        price: filling.price ?? 0,
       };
       return of(fillingCompleto);
     } else {
@@ -118,8 +118,8 @@ export class TacosService {
     if (environment.mockeable) {
       const tortillaCompleta: ITacoContent = {
         id: 70,
-        nombre: tortilla.nombre ?? '-',
-        precio: tortilla.precio ?? 0,
+        name: tortilla.name ?? '-',
+        price: tortilla.price ?? 0,
       };
       return of(tortillaCompleta);
     } else {

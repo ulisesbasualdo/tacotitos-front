@@ -72,9 +72,9 @@ interface ITacoForm {
               @for (filling of fillingsResource.value(); track $index) {
                 <option [ngValue]="filling" #optionFilling>
                   @if (isFillingSelected(filling)) {
-                    {{ filling.nombre }} ✓
+                    {{ filling.name }} ✓
                   } @else {
-                    {{ filling.nombre }}
+                    {{ filling.name }}
                   }
                 </option>
               }
@@ -85,7 +85,7 @@ interface ITacoForm {
             <ul class="d-flex flex-row">
               @for (filling of fillingsSelecteds(); track $index) {
                 <li class="d-flex align-items-baseline">
-                  {{ filling.nombre
+                  {{ filling.name
                   }}<ui-btn
                     (click)="unsetSelected(filling)"
                     icon="times"
@@ -115,7 +115,7 @@ interface ITacoForm {
                   let i = $index
                 ) {
                   <option #tortillaOption [ngValue]="tortilla">
-                    {{ tortilla.nombre }}
+                    {{ tortilla.name }}
                   </option>
                 }
               </select>
@@ -130,7 +130,7 @@ interface ITacoForm {
               id="sauce">
               @for (sauce of saucesResource.value(); track sauce.id) {
                 <option [ngValue]="sauce">
-                  {{ sauce.nombre }}
+                  {{ sauce.name }}
                 </option>
               }
             </select>
@@ -197,15 +197,15 @@ export class CrearTacoFormComponent implements OnInit {
     this.form.controls.tortilla.controls.sauce.valueChanges,
     { initialValue: this.form.controls.tortilla.controls.sauce.value }
   );
-  tortillaPrice = computed(() => this._tortillaSeleccionada()?.precio ?? 0);
+  tortillaPrice = computed(() => this._tortillaSeleccionada()?.price ?? 0);
   fillingsPrice = computed(() =>
     this.fillingsSelecteds().reduce(
-      (total, filling) => total + filling.precio,
+      (total, filling) => total + filling.price,
       0
     )
   );
   protected readonly saucePrice = computed(
-    () => this.sauceSeleccionada()?.precio ?? 0
+    () => this.sauceSeleccionada()?.price ?? 0
   );
   protected readonly totalPrice = computed(
     () => this.tortillaTotalPrice() + this.fillingsPrice() + this.saucePrice()
@@ -216,7 +216,7 @@ export class CrearTacoFormComponent implements OnInit {
     () => `${API_URL}/sauces`
   );
   protected readonly baseTortillaPrice = computed(
-    () => this._tortillaSeleccionada()?.precio ?? 0
+    () => this._tortillaSeleccionada()?.price ?? 0
   );
 
   protected readonly tipoMultiplicador = computed(() =>

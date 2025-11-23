@@ -5,6 +5,7 @@ import {
   ITacoContent,
 } from '../../../../../interfaces/definitions';
 import { TacosService } from '../../../../../services/data/tacos.service';
+import { ToasterController } from '../../../../../shared/components/toaster/toaster-controller';
 
 @Component({
   selector: 'app-tipo-tortilla',
@@ -45,8 +46,8 @@ import { TacosService } from '../../../../../services/data/tacos.service';
           @for (item of tiposTortilla(); track $index) {
             <tr>
               @if (!isEditing(item.id)) {
-                <td>{{ item.nombre }}</td>
-                <td>{{ item.precio }}</td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.price }}</td>
                 <td>
                   <ui-btn (click)="putItemEditMode(item.id, true)" icon="pen" />
                   <ui-btn icon="save" />
@@ -58,7 +59,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
                     #inputNombre
                     type="text"
                     placeholder="ingrese un nombre"
-                    [value]="item.nombre" />
+                    [value]="item.name" />
                 </td>
                 <td>
                   <input
@@ -66,7 +67,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
                     type="text"
                     placeholder="ingrese un precio"
                     class="text-right"
-                    [value]="item.precio" />
+                    [value]="item.price" />
                 </td>
                 <td>
                   <ui-btn
@@ -90,7 +91,7 @@ import { TacosService } from '../../../../../services/data/tacos.service';
 })
 export class TipoTortillaComponent implements AfterViewInit {
   protected readonly tacosService = inject(TacosService);
-
+  private toasterController = inject(ToasterController);
   public tiposTortilla = signal<ITortillaEditable[]>([] as ITortillaEditable[]);
 
   habilitarEditar(id: number | undefined): void {
@@ -119,8 +120,8 @@ export class TipoTortillaComponent implements AfterViewInit {
 
   add(nombre: string, precio: string): void {
     const tortilla: Partial<ITacoContent> = {
-      nombre: nombre,
-      precio: +precio,
+      name: nombre,
+      price: +precio,
     };
     this.tacosService.addTortilla(tortilla).subscribe({
       next: tortillaCreada => {
@@ -133,8 +134,8 @@ export class TipoTortillaComponent implements AfterViewInit {
   }
 
   saveEdit(item: ITacoContent, nuevoNombre: string, nuevoPrecio: string): void {
-    item.nombre = nuevoNombre;
-    item.precio = +nuevoPrecio;
+    item.name = nuevoNombre;
+    item.price = +nuevoPrecio;
     this.tacosService.editTortilla(item).subscribe((tortilla: ITacoContent) => {
       this.tiposTortilla.set(
         this.tiposTortilla().map(t => {
@@ -154,8 +155,12 @@ export class TipoTortillaComponent implements AfterViewInit {
       next: () => {
         this.tiposTortilla.set(this.tiposTortilla().filter(t => t.id !== id));
       },
-      error: (err: unknown) => {
-        console.error('Error al eliminar la tortilla:', err);
+      error: () => {
+        this.toasterController.show(
+          'Error',
+          'Error al eliminar la tortilla',
+          'info'
+        );
       },
     });
   }

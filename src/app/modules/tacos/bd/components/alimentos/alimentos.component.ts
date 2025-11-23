@@ -61,8 +61,8 @@ interface IFillingForm {
         @for (item of fillings(); track item.id) {
           <tr>
             @if (!item.editMode) {
-              <td>{{ item.nombre }}</td>
-              <td>{{ item.precio }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.price }}</td>
               <td>
                 <ui-btn (click)="habilitarEditar(item.id)" icon="pen" />
                 <ui-btn icon="save" />
@@ -74,7 +74,7 @@ interface IFillingForm {
                   #inputNombre
                   type="text"
                   placeholder="ingrese un nombre"
-                  [value]="item.nombre" />
+                  [value]="item.name" />
               </td>
               <td>
                 <input
@@ -82,7 +82,7 @@ interface IFillingForm {
                   type="text"
                   placeholder="ingrese un precio"
                   class="text-right"
-                  [value]="item.precio" />
+                  [value]="item.price" />
               </td>
               <td>
                 <ui-btn (click)="item.editMode = false" icon="times" />
@@ -151,8 +151,8 @@ export class AlimentosComponent implements OnInit {
   }
 
   saveEdit(item: ITacoContent, nuevoNombre: string, nuevoPrecio: string): void {
-    item.nombre = nuevoNombre;
-    item.precio = +nuevoPrecio;
+    item.name = nuevoNombre;
+    item.price = +nuevoPrecio;
     this.tacosService.editFilling(item).subscribe((filling: ITacoContent) => {
       this.fillings.update(items =>
         items.map(f => {
@@ -172,8 +172,8 @@ export class AlimentosComponent implements OnInit {
     inputPrecio: HTMLInputElement
   ): void {
     const filling: Partial<ITacoContent> = {
-      nombre: nombre,
-      precio: +precio,
+      name: nombre,
+      price: +precio,
     };
     this.tacosService.addFilling(filling).subscribe((filling: ITacoContent) => {
       this.fillings.update(items => [
