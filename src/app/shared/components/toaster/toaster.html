@@ -1,14 +1,15 @@
 <div class="toaster-container">
   @for (toast of toasterController.toasts(); track toast.id) {
-  @if(toast.isOpen()) {
-  <div
-    class="insert-container"
-    animate.enter="enter-animation"
-    animate.leave="deleting">
-    <div class="toaster">
-      <div class="toaster-title">{{ toast.title }}</div>
-      <div class="toaster-description">{{ toast.description }}</div>
-    </div>
-  </div>
-  } }
+    @if (toast.isOpen()) {
+      <div
+        class="insert-container"
+        animate.enter="enter-animation"
+        animate.leave="deleting">
+        <div class="toaster {{ toast.type }}">
+          <div class="toaster-title">{{ toast.title }}</div>
+          <div class="toaster-description">{{ toast.description }}</div>
+        </div>
+      </div>
+    }
+  }
 </div>

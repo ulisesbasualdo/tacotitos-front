@@ -17,7 +17,7 @@
   "singleAttributePerLine": false,
   "overrides": [
     {
-      "files": "*.component.html",
+      "files": "*.html",
       "options": {
         "parser": "angular",
         "htmlWhitespaceSensitivity": "ignore"

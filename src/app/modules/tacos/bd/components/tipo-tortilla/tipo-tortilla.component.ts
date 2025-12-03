@@ -159,7 +159,7 @@ export class TipoTortillaComponent implements AfterViewInit {
         this.toasterController.show(
           'Error',
           'Error al eliminar la tortilla',
-          'info'
+          'danger'
         );
       },
     });
