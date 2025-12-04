@@ -128,6 +128,7 @@ export class BtnComponent {
   public color = input<ButtonColor>('default');
   public size = input<string>('default');
   public disabled = input<boolean>(false);
+
   public icon = input<'times' | 'trash' | 'pen' | 'plus' | 'save' | null>(null);
   public noHover = input<BooleanInput>(false);
   protected _noHover = computed(() => coerceBooleanProperty(this.noHover()));

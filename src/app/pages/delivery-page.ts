@@ -1,32 +1,26 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { ITacoContent, TTortillaType } from '../interfaces/definitions';
+import { ITacoContent } from '../interfaces/definitions';
 import { API_URL, TacosService } from '../services/data/tacos.service';
 import { httpResource } from '@angular/common/http';
 import { BtnComponent } from '../ui/atoms/btn/btn.component';
 import { toSignal } from '@angular/core/rxjs-interop';
-
-interface TacoForm {
-  tortilla: ITacoContent;
-  type: TTortillaType;
-  sauce: ITacoContent | null;
-  fillings: ITacoContent | null;
-}
+import { UIDirtyResetDirective } from '../shared/directives/dirty-reset/dirty-reset.directive';
 
 @Component({
   selector: 'app-delivery',
-  imports: [ReactiveFormsModule, BtnComponent],
+  imports: [ReactiveFormsModule, BtnComponent, UIDirtyResetDirective],
   template: `
     <form [formGroup]="form" class="form" (ngSubmit)="submit()">
       <!-- Sección Tortilla -->
-      <div formGroupName="tortilla">
+      <div>
         <div class="row d-flex flex-row gap-2">
           <div class="mb-5">
             <label class="form-check-label">
               <input
                 class="form-check-input"
                 type="radio"
-                formControlName="tipo"
+                formControlName="type"
                 value="single" />
               Tortilla simple (precio base)
             </label>
@@ -34,7 +28,7 @@ interface TacoForm {
               <input
                 class="form-check-input"
                 type="radio"
-                formControlName="tipo"
+                formControlName="type"
                 value="double" />
               Tortilla doble (x2 precio tortilla)
             </label>
@@ -79,14 +73,14 @@ interface TacoForm {
         <!-- FIN ALIMENTOS -->
 
         <div class="row d-flex flex-row gap-5 align-items-baseline">
-          <div>
+          <div formGroupName="tortilla">
             <label class="form-label" for="tortillaNombre"
               >Tipo de tortilla:</label
             >
             @if (tacosService.getTortillas.hasValue()) {
               <select
                 class="form-control"
-                formControlName="nombre"
+                formControlName="name"
                 id="tortillaNombre"
                 required>
                 @for (
@@ -119,17 +113,16 @@ interface TacoForm {
       </div>
       <div class="btn-group mt-4">
         <!-- Sección Sauce -->
-        <ui-btn
-          [color]="'bgGrayTxtBlue'"
-          [text]="'Restablecer'"
-          [disabled]="form.pristine"
-          (click)="limpiarFillingsSelected(); form.reset()"></ui-btn>
-        <ui-btn
-          [color]="'green'"
-          [text]="'Crear Pedido'"
-          type="submit"
-          [disabled]="form.invalid">
-        </ui-btn>
+        <button
+          class="bgGrayTxtBlue"
+          app-dirty-reset
+          [form]="form"
+          (click)="limpiarFillingsSelected(); form.reset()">
+          Restablecer
+        </button>
+        <button class="green" type="submit" [disabled]="form.invalid">
+          Crear Pedido
+        </button>
         <div>precio: {{ totalPrice() }}</div>
       </div>
     </form>
@@ -145,15 +138,16 @@ export class DeliveryPage {
     () => `${API_URL}/sauces`
   );
 
-  form = this.formBuilder.nonNullable.group<TacoForm>({
-    tortilla: {
-      name: '',
-      price: 0,
-    },
-    type: 'single',
-    sauce: null,
-    fillings: null,
+  form = this.formBuilder.nonNullable.group({
+    tortilla: this.formBuilder.nonNullable.group({
+      name: this.formBuilder.nonNullable.control(''),
+      price: this.formBuilder.nonNullable.control(0),
+    }),
+    type: this.formBuilder.nonNullable.control<'single' | 'double'>('single'),
+    sauce: this.formBuilder.control<ITacoContent | null>(null),
+    fillings: this.formBuilder.control<ITacoContent | null>(null),
   });
+
   private readonly _tortillaSeleccionada = toSignal(
     this.form.controls.tortilla.valueChanges,
     { initialValue: this.form.controls.tortilla.value }

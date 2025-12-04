@@ -15,4 +15,8 @@ export const routes: Routes = [
         m => m.OrquestadorComponent
       ),
   },
+  {
+    path: '**',
+    redirectTo: 'delivery',
+  },
 ];

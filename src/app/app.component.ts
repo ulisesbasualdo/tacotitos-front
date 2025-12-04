@@ -1,14 +1,10 @@
 import { Component } from '@angular/core';
-import { OrquestadorComponent } from './modules/orquestador/orquestador.component';
-import { Toaster } from './shared/components/toaster/toaster';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [OrquestadorComponent, Toaster],
-  template: `
-    <app-orquestador />
-    <app-toaster />
-  `,
+  imports: [RouterOutlet],
+  template: ` <router-outlet /> `,
   styles: ``,
 })
 export class AppComponent {}

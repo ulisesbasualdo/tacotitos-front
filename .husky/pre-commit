@@ -6,7 +6,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "🧪 Ejecutando tests unitarios..."
-ng test --browsers=ChromeHeadless --watch=false
+npx ng test --watch=false --browsers=ChromeHeadless
 if [ $? -ne 0 ]; then
   echo "❌ Las pruebas unitarias fallaron. Abortando commit."
   exit 1
